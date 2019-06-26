@@ -1,6 +1,7 @@
 package file
 
 import (
+	"encoding/hex"
 	"encoding/json"
 
 	"github.com/iredelmeier/opentelemetry-playground"
@@ -22,6 +23,8 @@ func NewExporter(opts ...Option) *Exporter {
 
 func (e *Exporter) Export(spanData opentelemetry.SpanData) {
 	span := Span{
+		ID:            hex.EncodeToString(spanData.ID[:]),
+		TraceID:       hex.EncodeToString(spanData.TraceID[:]),
 		OperationName: spanData.OperationName,
 	}
 

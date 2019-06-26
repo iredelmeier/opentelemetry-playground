@@ -3,6 +3,8 @@ package opentelemetry
 import (
 	"context"
 	"sync"
+
+	"github.com/iredelmeier/opentelemetry-playground/internal"
 )
 
 type Tracer struct {
@@ -39,6 +41,8 @@ func (t *Tracer) StartSpan(operationName string) *Span {
 	}
 
 	return &Span{
+		id:            internal.NewSpanID(),
+		traceID:       internal.NewTraceID(),
 		operationName: operationName,
 		finish:        finish,
 	}
@@ -46,6 +50,8 @@ func (t *Tracer) StartSpan(operationName string) *Span {
 
 func (t *Tracer) finishSpan(span *Span) {
 	spanData := SpanData{
+		ID:            span.id,
+		TraceID:       span.traceID,
 		OperationName: span.operationName,
 	}
 
