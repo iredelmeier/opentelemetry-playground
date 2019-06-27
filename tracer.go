@@ -8,26 +8,24 @@ import (
 )
 
 type Tracer struct {
-	lock      *sync.RWMutex
-	exporters []SpanExporter
+	lock     *sync.RWMutex
+	exporter SpanExporter
 }
 
 func NewTracer(opts ...TracerOption) *Tracer {
 	c := newTracerConfig(opts...)
 
-	tracer := &Tracer{
-		lock:      &sync.RWMutex{},
-		exporters: c.exporters,
+	return &Tracer{
+		lock:     &sync.RWMutex{},
+		exporter: c.exporter,
 	}
-
-	return tracer
 }
 
 func (t *Tracer) Close(ctx context.Context) error {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 
-	t.exporters = nil
+	t.exporter = NoopSpanExporter{}
 
 	return nil
 }
@@ -57,15 +55,11 @@ func (t *Tracer) StartSpan(ctx context.Context, operationName string, opts ...St
 }
 
 func (t *Tracer) finishSpan(ctx context.Context, span *internal.Span) {
-	s := newSpan(ctx, span)
+	t.lock.RLock()
 
-	for _, exporter := range t.exporters {
-		t.lock.RLock()
+	go func() {
+		defer t.lock.RUnlock()
 
-		go func(e SpanExporter, span Span) {
-			e.ExportSpan(span)
-
-			t.lock.RUnlock()
-		}(exporter, s)
-	}
+		t.exporter.ExportSpan(newSpan(ctx, span))
+	}()
 }

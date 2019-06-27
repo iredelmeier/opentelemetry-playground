@@ -2,19 +2,21 @@ package opentelemetry
 
 type TracerOption func(*tracerConfig)
 
-func WithSpanExporters(exporters ...SpanExporter) TracerOption {
+func WithSpanExporter(exporter SpanExporter) TracerOption {
 	return func(c *tracerConfig) {
-		c.exporters = exporters
+		c.exporter = exporter
 	}
 }
 
 type tracerConfig struct {
-	exporters []SpanExporter
+	exporter SpanExporter
 }
 
 func newTracerConfig(opts ...TracerOption) *tracerConfig {
 	c := &tracerConfig{}
-	var defaultOpts []TracerOption
+	defaultOpts := []TracerOption{
+		WithSpanExporter(NoopSpanExporter{}),
+	}
 
 	for _, opt := range append(defaultOpts, opts...) {
 		opt(c)
