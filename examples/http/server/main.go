@@ -9,6 +9,7 @@ import (
 	"github.com/iredelmeier/opentelemetry-playground"
 	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/headers"
 )
 
 func main() {
@@ -38,7 +39,10 @@ func main() {
 
 func traceHandler(tracer *opentelemetry.Tracer, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := tracer.StartSpan(r.Context(), fmt.Sprintf("HTTP GET: %s", r.URL.Path))
+		extractor := headers.NewExtractor(r.Header)
+		ctx := extractor.Extract(r.Context())
+
+		ctx = tracer.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path))
 		defer opentelemetry.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)

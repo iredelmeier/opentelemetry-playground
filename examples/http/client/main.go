@@ -10,6 +10,7 @@ import (
 	"github.com/iredelmeier/opentelemetry-playground"
 	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/headers"
 )
 
 func main() {
@@ -21,6 +22,7 @@ func main() {
 	defer tracer.Close(context.Background())
 
 	req := &http.Request{
+		Header: make(http.Header),
 		Method: http.MethodGet,
 		URL: &url.URL{
 			Scheme: "http",
@@ -31,6 +33,9 @@ func main() {
 	ctx := tracer.StartSpan(context.Background(), fmt.Sprintf("HTTP GET: %s", req.URL))
 
 	req = req.WithContext(ctx)
+
+	injector := headers.NewInjector(req.Header)
+	injector.Inject(ctx)
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
