@@ -2,9 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-    - image: golang:alpine
+    - image: circleci/golang:1.12
     steps:
     - checkout
+    - run:
+        name: Build
+        command: ./scripts/build.sh
 workflows:
   version: 2
   test:
