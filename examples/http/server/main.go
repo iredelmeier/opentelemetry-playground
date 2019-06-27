@@ -15,7 +15,7 @@ import (
 func main() {
 	exporter := file.NewExporter()
 	tracerOpts := []opentelemetry.TracerOption{
-		opentelemetry.WithSpanExporters(exporter),
+		opentelemetry.WithSpanExporter(exporter),
 	}
 	tracer := opentelemetry.NewTracer(tracerOpts...)
 	defer tracer.Close(context.Background())
