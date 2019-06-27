@@ -20,15 +20,3 @@ func ContextWithParentSpan(ctx context.Context, parentSpan ParentSpan) context.C
 
 	return internal.ContextWithSpan(ctx, span)
 }
-
-func ParentSpanFromContext(ctx context.Context) (ParentSpan, bool) {
-	span, ok := internal.SpanFromContext(ctx)
-	if !ok {
-		return ParentSpan{}, ok
-	}
-
-	return ParentSpan{
-		ID:      span.ID(),
-		TraceID: span.TraceID(),
-	}, ok
-}

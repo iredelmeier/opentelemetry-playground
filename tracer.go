@@ -38,13 +38,12 @@ func (t *Tracer) StartSpan(ctx context.Context, operationName string) context.Co
 		internal.WithFinishSpan(t.finishSpan),
 	}
 
-	if parentSpan, ok := ParentSpanFromContext(ctx); ok {
-		parentSpanOpts := []internal.StartSpanOption{
-			internal.WithParentID(parentSpan.ID),
-			internal.WithTraceID(parentSpan.TraceID),
-		}
+	if parentID, ok := SpanIDFromContext(ctx); ok {
+		spanOpts = append(spanOpts, internal.WithParentID(parentID))
+	}
 
-		spanOpts = append(spanOpts, parentSpanOpts...)
+	if traceID, ok := TraceIDFromContext(ctx); ok {
+		spanOpts = append(spanOpts, internal.WithTraceID(traceID))
 	}
 
 	span := internal.NewSpan(spanOpts...)

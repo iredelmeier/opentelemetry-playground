@@ -20,19 +20,21 @@ func NewInjector(headers http.Header) *Injector {
 }
 
 func (i *Injector) Inject(ctx context.Context) {
-	if parentSpan, ok := opentelemetry.ParentSpanFromContext(ctx); ok {
-		traceParent := traceparent.TraceParent{
-			Version: traceparent.Version,
-			TraceID: parentSpan.TraceID,
-			SpanID:  parentSpan.ID,
-			Flags: traceparent.Flags{
-				Recorded: true,
-			},
-		}
-		traceContext := tracecontext.TraceContext{
-			TraceParent: traceParent,
-		}
+	if traceID, ok := opentelemetry.TraceIDFromContext(ctx); ok {
+		if spanID, ok := opentelemetry.SpanIDFromContext(ctx); ok {
+			traceParent := traceparent.TraceParent{
+				Version: traceparent.Version,
+				TraceID: traceID,
+				SpanID:  spanID,
+				Flags: traceparent.Flags{
+					Recorded: true,
+				},
+			}
+			traceContext := tracecontext.TraceContext{
+				TraceParent: traceParent,
+			}
 
-		traceContext.SetHeaders(i.headers)
+			traceContext.SetHeaders(i.headers)
+		}
 	}
 }
