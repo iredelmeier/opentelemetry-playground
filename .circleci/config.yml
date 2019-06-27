@@ -1,7 +1,12 @@
 version: 2
 jobs:
-  run:
+  build:
     docker:
     - image: golang:alpine
     steps:
     - checkout
+workflows:
+  version: 2
+  test:
+    jobs:
+    - build
