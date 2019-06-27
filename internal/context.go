@@ -8,11 +8,8 @@ func ContextWithSpan(ctx context.Context, span *Span) context.Context {
 	return context.WithValue(ctx, spanCtxKey{}, span)
 }
 
-func SpanFromContext(ctx context.Context) *Span {
+func SpanFromContext(ctx context.Context) (*Span, bool) {
 	span, ok := ctx.Value(spanCtxKey{}).(*Span)
-	if !ok {
-		return NewSpan()
-	}
 
-	return span
+	return span, ok
 }

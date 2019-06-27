@@ -15,7 +15,9 @@ func main() {
 	tracer := opentelemetry.NewTracer(tracerOpts...)
 	defer tracer.Close(context.Background())
 
-	ctx := tracer.StartSpan(context.Background(), "abc")
+	parentCtx := tracer.StartSpan(context.Background(), "parent")
+	defer opentelemetry.FinishSpan(parentCtx)
 
-	opentelemetry.FinishSpan(ctx)
+	childCtx := tracer.StartSpan(parentCtx, "child")
+	defer opentelemetry.FinishSpan(childCtx)
 }

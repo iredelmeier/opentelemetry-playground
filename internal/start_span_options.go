@@ -1,6 +1,10 @@
 package internal
 
-import "github.com/gofrs/uuid"
+import (
+	"context"
+
+	"github.com/gofrs/uuid"
+)
 
 type StartSpanOption func(*startSpanConfig)
 
@@ -13,6 +17,12 @@ func WithID(id [8]byte) StartSpanOption {
 func WithTraceID(traceID [16]byte) StartSpanOption {
 	return func(c *startSpanConfig) {
 		c.traceID = traceID
+	}
+}
+
+func WithParentID(parentID [8]byte) StartSpanOption {
+	return func(c *startSpanConfig) {
+		c.parentID = parentID
 	}
 }
 
@@ -31,7 +41,9 @@ func WithFinishSpan(finishSpan FinishSpan) StartSpanOption {
 type startSpanConfig struct {
 	id            [8]byte
 	traceID       [16]byte
+	parentID      [8]byte
 	operationName string
+	parentSpanCtx context.Context
 	finishSpan    FinishSpan
 }
 

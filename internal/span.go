@@ -7,6 +7,7 @@ import (
 type Span struct {
 	id            [8]byte
 	traceID       [16]byte
+	parentID      [8]byte
 	operationName string
 	finishOnce    *sync.Once
 	finishSpan    FinishSpan
@@ -18,10 +19,12 @@ func NewSpan(opts ...StartSpanOption) *Span {
 	return &Span{
 		id:            c.id,
 		traceID:       c.traceID,
+		parentID:      c.parentID,
 		operationName: c.operationName,
 		finishOnce:    &sync.Once{},
 		finishSpan:    c.finishSpan,
 	}
+
 }
 
 func (s *Span) OperationName() string {
@@ -34,6 +37,10 @@ func (s *Span) ID() [8]byte {
 
 func (s *Span) TraceID() [16]byte {
 	return s.traceID
+}
+
+func (s *Span) ParentID() [8]byte {
+	return s.parentID
 }
 
 func (s *Span) Finish() {
