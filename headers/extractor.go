@@ -2,7 +2,6 @@ package headers
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 
 	"github.com/iredelmeier/opentelemetry-playground"
@@ -22,7 +21,6 @@ func NewExtractor(headers http.Header) *Extractor {
 func (e *Extractor) Extract(ctx context.Context) context.Context {
 	traceContext, err := tracecontext.FromHeaders(e.headers)
 	if err != nil {
-		fmt.Println("ERR", err)
 		return ctx
 	}
 
