@@ -5,5 +5,5 @@ type Span struct {
 	TraceID       string            `json:"trace_id"`
 	ParentID      string            `json:"parent_id,omitempty"`
 	OperationName string            `json:"operation_name"`
-	Tags          map[string]string `json:"tags"`
+	Tags          map[string]string `json:"tags,omitempty"`
 }
