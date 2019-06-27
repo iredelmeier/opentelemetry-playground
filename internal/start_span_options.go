@@ -1,9 +1,5 @@
 package internal
 
-import (
-	"github.com/gofrs/uuid"
-)
-
 type StartSpanOption func(*startSpanConfig)
 
 func WithID(id [8]byte) StartSpanOption {
@@ -45,17 +41,8 @@ type startSpanConfig struct {
 }
 
 func newStartSpanConfig(opts ...StartSpanOption) *startSpanConfig {
-	u, _ := uuid.NewV4()
-	var id [8]byte
-
-	copy(id[:], u[8:])
-
-	traceID, _ := uuid.NewV4()
-
 	c := &startSpanConfig{}
 	defaultOpts := []StartSpanOption{
-		WithID(id),
-		WithTraceID(traceID),
 		WithFinishSpan(defaultFinishSpan),
 	}
 

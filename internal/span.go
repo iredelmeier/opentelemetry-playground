@@ -2,6 +2,8 @@ package internal
 
 import (
 	"sync"
+
+	"github.com/gofrs/uuid"
 )
 
 type Span struct {
@@ -16,7 +18,7 @@ type Span struct {
 func NewSpan(opts ...StartSpanOption) *Span {
 	c := newStartSpanConfig(opts...)
 
-	return &Span{
+	span := &Span{
 		id:            c.id,
 		traceID:       c.traceID,
 		parentID:      c.parentID,
@@ -25,6 +27,19 @@ func NewSpan(opts ...StartSpanOption) *Span {
 		finishSpan:    c.finishSpan,
 	}
 
+	if span.id == [8]byte{} {
+		u, _ := uuid.NewV4()
+
+		copy(span.id[:], u[8:])
+	}
+
+	if span.traceID == [16]byte{} {
+		u, _ := uuid.NewV4()
+
+		span.traceID = u
+	}
+
+	return span
 }
 
 func (s *Span) OperationName() string {
