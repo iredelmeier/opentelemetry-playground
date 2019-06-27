@@ -12,14 +12,14 @@ const (
 )
 
 type Tracer struct {
-	tracer *opentelemetry.Tracer
+	exporter opentelemetry.SpanExporter
 }
 
 func NewTracer(opts ...TracerOption) opentracing.Tracer {
 	c := newTracerConfig(opts...)
 
 	return &Tracer{
-		tracer: c.openTelemetryTracer,
+		exporter: c.exporter,
 	}
 }
 
@@ -45,7 +45,9 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 		}
 	}
 
-	ctx := t.tracer.StartSpan(context.Background(), operationName, sso...)
+	ctx := opentelemetry.ContextWithSpanExporter(context.Background(), t.exporter)
+
+	ctx = opentelemetry.StartSpan(ctx, operationName, sso...)
 
 	return &Span{
 		tracer: t,

@@ -13,12 +13,7 @@ func main() {
 	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
-	tracerOpts := []opentelemetry.TracerOption{
-		opentelemetry.WithSpanExporter(exporter),
-	}
-	tracer := opentelemetry.NewTracer(tracerOpts...)
-
-	otTracer := bridge.NewTracer(bridge.WithOpenTelemetryTracer(tracer))
+	otTracer := bridge.NewTracer(bridge.WithExporter(exporter))
 
 	parent := otTracer.StartSpan("parent")
 	defer parent.Finish()

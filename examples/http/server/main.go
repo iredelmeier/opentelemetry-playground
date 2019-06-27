@@ -16,11 +16,6 @@ func main() {
 	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
-	tracerOpts := []opentelemetry.TracerOption{
-		opentelemetry.WithSpanExporter(exporter),
-	}
-	tracer := opentelemetry.NewTracer(tracerOpts...)
-
 	serveMux := http.NewServeMux()
 
 	serveMux.HandleFunc(internal.Path, func(w http.ResponseWriter, r *http.Request) {
@@ -29,7 +24,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    internal.Host,
-		Handler: traceHandler(tracer, serveMux.ServeHTTP),
+		Handler: traceHandler(exporter, serveMux.ServeHTTP),
 	}
 	defer server.Close()
 
@@ -38,7 +33,7 @@ func main() {
 	}
 }
 
-func traceHandler(tracer *opentelemetry.Tracer, handler http.HandlerFunc) http.HandlerFunc {
+func traceHandler(exporter opentelemetry.SpanExporter, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		extractor := headers.NewExtractor(r.Header)
 		parentSpan := extractor.Extract(r.Context())
@@ -47,11 +42,11 @@ func traceHandler(tracer *opentelemetry.Tracer, handler http.HandlerFunc) http.H
 			opentelemetry.WithParentID(parentSpan.ID),
 		}
 
-		ctx := r.Context()
+		ctx := opentelemetry.ContextWithSpanExporter(r.Context(), exporter)
 
 		ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "server")
 
-		ctx = tracer.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
+		ctx = opentelemetry.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
 		defer opentelemetry.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)

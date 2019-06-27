@@ -17,22 +17,54 @@ type Span struct {
 	Tags          map[string]string
 }
 
-func newSpan(ctx context.Context, span *internal.Span) Span {
-	tags := make(map[string]string)
+func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOption) context.Context {
+	c := newStartSpanConfig(opts...)
 
-	if kv, ok := internal.KeyValuesFromContext(ctx); ok {
-		for _, entry := range kv.Entries() {
-			tags[entry.Key] = entry.Value
-		}
+	spanOpts := []internal.StartSpanOption{
+		internal.WithID(c.id),
+		internal.WithTraceID(c.traceID),
+		internal.WithParentID(c.parentID),
+		internal.WithOperationName(operationName),
+		internal.WithFinishSpan(finishSpan),
 	}
 
-	return Span{
-		ID:            span.ID(),
-		TraceID:       span.TraceID(),
-		ParentID:      span.ParentID(),
-		OperationName: span.OperationName(),
-		StartTime:     span.StartTime(),
-		Duration:      time.Since(span.StartTime()),
-		Tags:          tags,
+	if traceID, ok := TraceIDFromContext(ctx); ok {
+		spanOpts = append(spanOpts, internal.WithTraceID(traceID))
+	}
+
+	if parentID, ok := SpanIDFromContext(ctx); ok {
+		spanOpts = append(spanOpts, internal.WithParentID(parentID))
+	}
+
+	span := internal.NewSpan(spanOpts...)
+
+	return internal.ContextWithSpan(ctx, span)
+}
+
+func FinishSpan(ctx context.Context) {
+	if span, ok := internal.SpanFromContext(ctx); ok {
+		span.Finish(ctx)
+	}
+}
+
+func finishSpan(ctx context.Context, span *internal.Span) {
+	if exporter, ok := SpanExporterFromContext(ctx); ok {
+		tags := make(map[string]string)
+
+		if kv, ok := internal.KeyValuesFromContext(ctx); ok {
+			for _, entry := range kv.Entries() {
+				tags[entry.Key] = entry.Value
+			}
+		}
+
+		exporter.ExportSpan(Span{
+			ID:            span.ID(),
+			TraceID:       span.TraceID(),
+			ParentID:      span.ParentID(),
+			OperationName: span.OperationName(),
+			StartTime:     span.StartTime(),
+			Duration:      time.Since(span.StartTime()),
+			Tags:          tags,
+		})
 	}
 }
