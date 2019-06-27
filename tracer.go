@@ -33,27 +33,35 @@ func (t *Tracer) Close(ctx context.Context) error {
 }
 
 func (t *Tracer) StartSpan(ctx context.Context, operationName string, opts ...StartSpanOption) context.Context {
-	c := newStartSpanConfig(opts...)
-
-	spanOpts := []internal.StartSpanOption{
-		internal.WithID(c.id),
-		internal.WithTraceID(c.traceID),
-		internal.WithParentID(c.parentID),
-		internal.WithOperationName(operationName),
-		internal.WithFinishSpan(t.finishSpan),
+	if _, ok := internal.StateFromContext(ctx); !ok {
+		ctx = internal.ContextWithState(ctx)
 	}
 
-	if traceID, ok := TraceIDFromContext(ctx); ok {
-		spanOpts = append(spanOpts, internal.WithTraceID(traceID))
+	if state, ok := internal.StateFromContext(ctx); ok {
+		c := newStartSpanConfig(opts...)
+
+		spanOpts := []internal.StartSpanOption{
+			internal.WithID(c.id),
+			internal.WithTraceID(c.traceID),
+			internal.WithParentID(c.parentID),
+			internal.WithOperationName(operationName),
+			internal.WithFinishSpan(t.finishSpan),
+		}
+
+		if traceID, ok := TraceIDFromContext(ctx); ok {
+			spanOpts = append(spanOpts, internal.WithTraceID(traceID))
+		}
+
+		if parentID, ok := SpanIDFromContext(ctx); ok {
+			spanOpts = append(spanOpts, internal.WithParentID(parentID))
+		}
+
+		span := internal.NewSpan(spanOpts...)
+
+		state.SetSpan(span)
 	}
 
-	if parentID, ok := SpanIDFromContext(ctx); ok {
-		spanOpts = append(spanOpts, internal.WithParentID(parentID))
-	}
-
-	span := internal.NewSpan(spanOpts...)
-
-	return internal.ContextWithSpan(ctx, span)
+	return ctx
 }
 
 func (t *Tracer) finishSpan(span *internal.Span) {

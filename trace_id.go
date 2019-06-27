@@ -11,10 +11,9 @@ const TraceIDSize = 16
 type TraceID [TraceIDSize]byte
 
 func TraceIDFromContext(ctx context.Context) (TraceID, bool) {
-	span, ok := internal.SpanFromContext(ctx)
-	if !ok {
-		return TraceID{}, false
+	if state, ok := internal.StateFromContext(ctx); ok {
+		return state.Span().TraceID(), true
 	}
 
-	return span.TraceID(), true
+	return TraceID{}, false
 }

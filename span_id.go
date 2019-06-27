@@ -11,10 +11,9 @@ const SpanIDSize = 8
 type SpanID [SpanIDSize]byte
 
 func SpanIDFromContext(ctx context.Context) (SpanID, bool) {
-	span, ok := internal.SpanFromContext(ctx)
-	if !ok {
-		return SpanID{}, false
+	if state, ok := internal.StateFromContext(ctx); ok {
+		return state.Span().ID(), true
 	}
 
-	return span.ID(), true
+	return SpanID{}, false
 }
