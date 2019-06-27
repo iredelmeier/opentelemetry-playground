@@ -9,7 +9,7 @@ import (
 
 type Tracer struct {
 	lock      *sync.RWMutex
-	exporters []Exporter
+	exporters []SpanExporter
 }
 
 func NewTracer(opts ...TracerOption) *Tracer {
@@ -62,8 +62,8 @@ func (t *Tracer) finishSpan(ctx context.Context, span *internal.Span) {
 	for _, exporter := range t.exporters {
 		t.lock.RLock()
 
-		go func(e Exporter, span Span) {
-			e.Export(span)
+		go func(e SpanExporter, span Span) {
+			e.ExportSpan(span)
 
 			t.lock.RUnlock()
 		}(exporter, s)
