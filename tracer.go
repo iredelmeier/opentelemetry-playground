@@ -32,36 +32,30 @@ func (t *Tracer) Close(ctx context.Context) error {
 	return nil
 }
 
-func (t *Tracer) StartSpan(operationName string) *Span {
-	finishOnce := &sync.Once{}
-	finish := func(span *Span) {
-		finishOnce.Do(func() {
-			t.finishSpan(span)
-		})
+func (t *Tracer) StartSpan(ctx context.Context, operationName string) context.Context {
+	spanOpts := []internal.StartSpanOption{
+		internal.WithOperationName(operationName),
+		internal.WithFinishSpan(t.finishSpan),
 	}
+	span := internal.NewSpan(spanOpts...)
 
-	return &Span{
-		id:            internal.NewSpanID(),
-		traceID:       internal.NewTraceID(),
-		operationName: operationName,
-		finish:        finish,
-	}
+	return internal.ContextWithSpan(ctx, span)
 }
 
-func (t *Tracer) finishSpan(span *Span) {
-	spanData := SpanData{
-		ID:            span.id,
-		TraceID:       span.traceID,
-		OperationName: span.operationName,
+func (t *Tracer) finishSpan(span *internal.Span) {
+	s := Span{
+		ID:            span.ID(),
+		TraceID:       span.TraceID(),
+		OperationName: span.OperationName(),
 	}
 
 	for _, exporter := range t.exporters {
 		t.lock.RLock()
 
-		go func(e Exporter, sd SpanData) {
-			e.Export(sd)
+		go func(e Exporter, span Span) {
+			e.Export(span)
 
 			t.lock.RUnlock()
-		}(exporter, spanData)
+		}(exporter, s)
 	}
 }

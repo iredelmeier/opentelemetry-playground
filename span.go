@@ -1,14 +1,16 @@
 package opentelemetry
 
-type finish func(*Span)
+const (
+	TraceIDSize = 16
+	SpanIDSize  = 8
+)
+
+type SpanID [SpanIDSize]byte
+
+type TraceID [TraceIDSize]byte
 
 type Span struct {
-	id            SpanID
-	traceID       TraceID
-	operationName string
-	finish        finish
-}
-
-func (s *Span) Finish() {
-	s.finish(s)
+	ID            SpanID
+	TraceID       TraceID
+	OperationName string
 }

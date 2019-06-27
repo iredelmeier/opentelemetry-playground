@@ -15,6 +15,7 @@ func main() {
 	tracer := opentelemetry.NewTracer(tracerOpts...)
 	defer tracer.Close(context.Background())
 
-	span := tracer.StartSpan("abc")
-	span.Finish()
+	ctx := tracer.StartSpan(context.Background(), "abc")
+
+	opentelemetry.FinishSpan(ctx)
 }

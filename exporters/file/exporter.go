@@ -21,14 +21,12 @@ func NewExporter(opts ...Option) *Exporter {
 	}
 }
 
-func (e *Exporter) Export(spanData opentelemetry.SpanData) {
-	span := Span{
-		ID:            hex.EncodeToString(spanData.ID[:]),
-		TraceID:       hex.EncodeToString(spanData.TraceID[:]),
-		OperationName: spanData.OperationName,
-	}
-
-	if err := e.encoder.Encode(span); err != nil {
+func (e *Exporter) Export(span opentelemetry.Span) {
+	if err := e.encoder.Encode(Span{
+		ID:            hex.EncodeToString(span.ID[:]),
+		TraceID:       hex.EncodeToString(span.TraceID[:]),
+		OperationName: span.OperationName,
+	}); err != nil {
 		e.errorHandler.Handle(err)
 	}
 }
