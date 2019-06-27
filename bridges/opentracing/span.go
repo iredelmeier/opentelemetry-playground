@@ -2,6 +2,7 @@ package opentracing
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/iredelmeier/opentelemetry-playground"
@@ -42,7 +43,10 @@ func (s *Span) SetOperationName(operationName string) opentracing.Span {
 }
 
 func (s *Span) SetTag(key string, value interface{}) opentracing.Span {
-	// TODO
+	if b, err := json.Marshal(value); err == nil {
+		s.ctx = opentelemetry.ContextWithKeyValue(s.ctx, key, string(b))
+	}
+
 	return s
 }
 

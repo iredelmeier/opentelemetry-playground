@@ -45,7 +45,12 @@ func traceHandler(tracer *opentelemetry.Tracer, handler http.HandlerFunc) http.H
 			opentelemetry.WithTraceID(parentSpan.TraceID),
 			opentelemetry.WithParentID(parentSpan.ID),
 		}
-		ctx := tracer.StartSpan(context.Background(), fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
+
+		ctx := r.Context()
+
+		ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "server")
+
+		ctx = tracer.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
 		defer opentelemetry.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)
