@@ -5,8 +5,20 @@ import (
 	"sync"
 )
 
+type spanExporterCtxKey struct{}
+
 type SpanExporter interface {
 	ExportSpan(Span)
+}
+
+func ContextWithSpanExporter(ctx context.Context, spanExporter SpanExporter) context.Context {
+	return context.WithValue(ctx, spanExporterCtxKey{}, spanExporter)
+}
+
+func SpanExporterFromContext(ctx context.Context) (SpanExporter, bool) {
+	spanExporter, ok := ctx.Value(spanExporterCtxKey{}).(SpanExporter)
+
+	return spanExporter, ok
 }
 
 type NoopSpanExporter struct{}

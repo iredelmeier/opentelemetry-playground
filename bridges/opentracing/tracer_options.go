@@ -4,20 +4,20 @@ import "github.com/iredelmeier/opentelemetry-playground"
 
 type TracerOption func(*tracerConfig)
 
-func WithOpenTelemetryTracer(openTelemetryTracer *opentelemetry.Tracer) TracerOption {
+func WithExporter(exporter opentelemetry.SpanExporter) TracerOption {
 	return func(c *tracerConfig) {
-		c.openTelemetryTracer = openTelemetryTracer
+		c.exporter = exporter
 	}
 }
 
 type tracerConfig struct {
-	openTelemetryTracer *opentelemetry.Tracer
+	exporter opentelemetry.SpanExporter
 }
 
 func newTracerConfig(opts ...TracerOption) *tracerConfig {
 	c := &tracerConfig{}
 	defaultOpts := []TracerOption{
-		WithOpenTelemetryTracer(opentelemetry.NewTracer()),
+		WithExporter(opentelemetry.NoopSpanExporter{}),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {

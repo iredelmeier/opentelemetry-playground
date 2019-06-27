@@ -17,11 +17,6 @@ func main() {
 	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
-	tracerOpts := []opentelemetry.TracerOption{
-		opentelemetry.WithSpanExporter(exporter),
-	}
-	tracer := opentelemetry.NewTracer(tracerOpts...)
-
 	req := &http.Request{
 		Header: make(http.Header),
 		Method: http.MethodGet,
@@ -32,9 +27,9 @@ func main() {
 		},
 	}
 
-	ctx := req.Context()
+	ctx := opentelemetry.ContextWithSpanExporter(req.Context(), exporter)
 
-	ctx = tracer.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", req.URL))
+	ctx = opentelemetry.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", req.URL))
 	ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "client")
 
 	req = req.WithContext(ctx)
