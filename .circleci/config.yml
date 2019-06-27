@@ -6,8 +6,8 @@ jobs:
     steps:
     - checkout
     - run:
-      name: Build
-      command: ./scripts/build.sh
+        name: Build
+        command: ./scripts/build.sh
 workflows:
   version: 2
   test:
