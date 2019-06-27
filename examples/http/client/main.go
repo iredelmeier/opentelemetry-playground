@@ -30,7 +30,11 @@ func main() {
 			Path:   internal.Path,
 		},
 	}
-	ctx := tracer.StartSpan(context.Background(), fmt.Sprintf("HTTP GET: %s", req.URL))
+
+	ctx := req.Context()
+
+	ctx = tracer.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", req.URL))
+	ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "client")
 
 	req = req.WithContext(ctx)
 

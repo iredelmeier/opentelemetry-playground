@@ -65,7 +65,7 @@ func (t *Tracer) StartSpan(ctx context.Context, operationName string, opts ...St
 }
 
 func (t *Tracer) finishSpan(ctx context.Context, span *internal.Span) {
-	s := newSpan(span)
+	s := newSpan(ctx, span)
 
 	for _, exporter := range t.exporters {
 		t.lock.RLock()

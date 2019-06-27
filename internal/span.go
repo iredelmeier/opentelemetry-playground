@@ -12,6 +12,7 @@ type Span struct {
 	traceID       [16]byte
 	parentID      [8]byte
 	operationName string
+	tags          map[string]string
 	finishOnce    *sync.Once
 	finishSpan    FinishSpan
 }
@@ -24,6 +25,7 @@ func NewSpan(opts ...StartSpanOption) *Span {
 		traceID:       c.traceID,
 		parentID:      c.parentID,
 		operationName: c.operationName,
+		tags:          make(map[string]string),
 		finishOnce:    &sync.Once{},
 		finishSpan:    c.finishSpan,
 	}
