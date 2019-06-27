@@ -18,16 +18,14 @@ func NewExtractor(headers http.Header) *Extractor {
 	}
 }
 
-func (e *Extractor) Extract(ctx context.Context) context.Context {
+func (e *Extractor) Extract(ctx context.Context) opentelemetry.ParentSpan {
 	traceContext, err := tracecontext.FromHeaders(e.headers)
 	if err != nil {
-		return ctx
+		return opentelemetry.ParentSpan{}
 	}
 
-	parentSpan := opentelemetry.ParentSpan{
+	return opentelemetry.ParentSpan{
 		ID:      traceContext.TraceParent.SpanID,
 		TraceID: traceContext.TraceParent.TraceID,
 	}
-
-	return opentelemetry.ContextWithParentSpan(ctx, parentSpan)
 }
