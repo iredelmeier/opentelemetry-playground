@@ -1,8 +1,6 @@
 package internal
 
 import (
-	"context"
-
 	"github.com/gofrs/uuid"
 )
 
@@ -43,7 +41,6 @@ type startSpanConfig struct {
 	traceID       [16]byte
 	parentID      [8]byte
 	operationName string
-	parentSpanCtx context.Context
 	finishSpan    FinishSpan
 }
 
