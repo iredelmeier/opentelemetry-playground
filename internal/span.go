@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/gofrs/uuid"
 )
@@ -12,6 +13,7 @@ type Span struct {
 	traceID       [16]byte
 	parentID      [8]byte
 	operationName string
+	startTime     time.Time
 	finishOnce    *sync.Once
 	finishSpan    FinishSpan
 }
@@ -24,6 +26,7 @@ func NewSpan(opts ...StartSpanOption) *Span {
 		traceID:       c.traceID,
 		parentID:      c.parentID,
 		operationName: c.operationName,
+		startTime:     c.startTime,
 		finishOnce:    &sync.Once{},
 		finishSpan:    c.finishSpan,
 	}
@@ -57,6 +60,10 @@ func (s *Span) TraceID() [16]byte {
 
 func (s *Span) ParentID() [8]byte {
 	return s.parentID
+}
+
+func (s *Span) StartTime() time.Time {
+	return s.startTime
 }
 
 func (s *Span) Finish(ctx context.Context) {

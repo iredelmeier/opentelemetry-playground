@@ -2,6 +2,7 @@ package opentelemetry
 
 import (
 	"context"
+	"time"
 
 	"github.com/iredelmeier/opentelemetry-playground/internal"
 )
@@ -11,6 +12,8 @@ type Span struct {
 	TraceID       TraceID
 	ParentID      SpanID
 	OperationName string
+	StartTime     time.Time
+	Duration      time.Duration
 	Tags          map[string]string
 }
 
@@ -28,6 +31,8 @@ func newSpan(ctx context.Context, span *internal.Span) Span {
 		TraceID:       span.TraceID(),
 		ParentID:      span.ParentID(),
 		OperationName: span.OperationName(),
+		StartTime:     span.StartTime(),
+		Duration:      time.Since(span.StartTime()),
 		Tags:          tags,
 	}
 }
