@@ -7,7 +7,7 @@ import (
 )
 
 func FinishSpan(ctx context.Context) {
-	if state, ok := internal.StateFromContext(ctx); ok {
-		state.Span().Finish(ctx)
+	if span, ok := internal.SpanFromContext(ctx); ok {
+		span.Finish(ctx)
 	}
 }

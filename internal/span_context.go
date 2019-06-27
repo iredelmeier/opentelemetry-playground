@@ -2,14 +2,14 @@ package internal
 
 import "context"
 
-type ctxKey struct{}
+type spanCtxKey struct{}
 
-func ContextWithState(ctx context.Context) context.Context {
-	return context.WithValue(ctx, ctxKey{}, NewState())
+func ContextWithSpan(ctx context.Context, span *Span) context.Context {
+	return context.WithValue(ctx, spanCtxKey{}, span)
 }
 
-func StateFromContext(ctx context.Context) (*State, bool) {
-	state, ok := ctx.Value(ctxKey{}).(*State)
+func SpanFromContext(ctx context.Context) (*Span, bool) {
+	span, ok := ctx.Value(spanCtxKey{}).(*Span)
 
-	return state, ok
+	return span, ok
 }
