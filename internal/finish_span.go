@@ -1,5 +1,7 @@
 package internal
 
-type FinishSpan func(*Span)
+import "context"
 
-func defaultFinishSpan(*Span) {}
+type FinishSpan func(context.Context, *Span)
+
+func defaultFinishSpan(context.Context, *Span) {}
