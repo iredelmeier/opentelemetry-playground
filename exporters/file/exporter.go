@@ -22,7 +22,7 @@ func NewExporter(opts ...Option) *Exporter {
 	}
 }
 
-func (e *Exporter) Export(span opentelemetry.Span) {
+func (e *Exporter) ExportSpan(span opentelemetry.Span) {
 	var parentID string
 	if id := span.ParentID; !isEmptySpanID(id) {
 		parentID = hex.EncodeToString(id[:])
