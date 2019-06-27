@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/iredelmeier/opentelemetry-playground"
-	"github.com/lightstep/tracecontext.go/traceparent"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 )
@@ -24,9 +23,17 @@ func (s *Span) FinishWithOptions(opts opentracing.FinishOptions) {
 }
 
 func (s *Span) Context() opentracing.SpanContext {
-	return &SpanContext{
-		span: s,
+	spanContext := &SpanContext{}
+
+	if id, ok := opentelemetry.SpanIDFromContext(s.ctx); ok {
+		spanContext.id = id
 	}
+
+	if traceID, ok := opentelemetry.TraceIDFromContext(s.ctx); ok {
+		spanContext.traceID = traceID
+	}
+
+	return spanContext
 }
 
 func (s *Span) SetOperationName(operationName string) opentracing.Span {
@@ -88,23 +95,4 @@ func (s *Span) Log(logData opentracing.LogData) {
 
 func (s *Span) log(logRecord opentracing.LogRecord) {
 	// TODO
-}
-
-func (s *Span) traceParent() traceparent.TraceParent {
-	traceParent := traceparent.TraceParent{
-		Version: traceparent.Version,
-		Flags: traceparent.Flags{
-			Recorded: true,
-		},
-	}
-
-	if spanID, ok := opentelemetry.SpanIDFromContext(s.ctx); ok {
-		traceParent.SpanID = spanID
-	}
-
-	if traceID, ok := opentelemetry.TraceIDFromContext(s.ctx); ok {
-		traceParent.TraceID = traceID
-	}
-
-	return traceParent
 }

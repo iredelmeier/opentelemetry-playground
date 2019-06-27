@@ -1,7 +1,6 @@
 package opentracing
 
 import (
-	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,15 +12,27 @@ import (
 )
 
 type SpanContext struct {
-	span *Span
+	id      opentelemetry.SpanID
+	traceID opentelemetry.TraceID
 }
 
 func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {}
 
+func (sc *SpanContext) traceParent() traceparent.TraceParent {
+	return traceparent.TraceParent{
+		Version: traceparent.Version,
+		SpanID:  sc.id,
+		TraceID: sc.traceID,
+		Flags: traceparent.Flags{
+			Recorded: true,
+		},
+	}
+}
+
 func (sc *SpanContext) injectBinary(carrier interface{}) error {
 	switch c := carrier.(type) {
 	case io.Writer:
-		traceParent := sc.span.traceParent()
+		traceParent := sc.traceParent()
 
 		if _, err := c.Write([]byte(traceParent.String())); err != nil {
 			return err
@@ -37,7 +48,7 @@ func (sc *SpanContext) injectTextMap(carrier interface{}) error {
 	switch c := carrier.(type) {
 	case http.Header:
 		traceContext := tracecontext.TraceContext{
-			TraceParent: sc.span.traceParent(),
+			TraceParent: sc.traceParent(),
 		}
 
 		traceContext.SetHeaders(c)
@@ -46,7 +57,7 @@ func (sc *SpanContext) injectTextMap(carrier interface{}) error {
 	case opentracing.HTTPHeadersCarrier:
 		return sc.injectTextMap(http.Header(c))
 	case opentracing.TextMapWriter:
-		c.Set(traceParentKey, sc.span.traceParent().String())
+		c.Set(traceParentKey, sc.traceParent().String())
 
 		return nil
 	default:
@@ -67,15 +78,9 @@ func extractBinary(carrier interface{}) (*SpanContext, error) {
 			return nil, err
 		}
 
-		parentSpan := opentelemetry.ParentSpan{
-			ID:      traceParent.SpanID,
-			TraceID: traceParent.TraceID,
-		}
-
 		return &SpanContext{
-			span: &Span{
-				ctx: opentelemetry.ContextWithParentSpan(context.Background(), parentSpan),
-			},
+			id:      traceParent.SpanID,
+			traceID: traceParent.TraceID,
 		}, nil
 	default:
 		return nil, opentracing.ErrInvalidCarrier
@@ -90,15 +95,9 @@ func extractTextMap(carrier interface{}) (*SpanContext, error) {
 			return nil, err
 		}
 
-		parentSpan := opentelemetry.ParentSpan{
-			ID:      traceContext.TraceParent.SpanID,
-			TraceID: traceContext.TraceParent.TraceID,
-		}
-
 		return &SpanContext{
-			span: &Span{
-				ctx: opentelemetry.ContextWithParentSpan(context.Background(), parentSpan),
-			},
+			id:      traceContext.TraceParent.SpanID,
+			traceID: traceContext.TraceParent.TraceID,
 		}, nil
 	case opentracing.HTTPHeadersCarrier:
 		return extractTextMap(http.Header(c))
@@ -119,15 +118,9 @@ func extractTextMap(carrier interface{}) (*SpanContext, error) {
 			return nil, err
 		}
 
-		parentSpan := opentelemetry.ParentSpan{
-			ID:      traceParent.SpanID,
-			TraceID: traceParent.TraceID,
-		}
-
 		return &SpanContext{
-			span: &Span{
-				ctx: opentelemetry.ContextWithParentSpan(context.Background(), parentSpan),
-			},
+			id:      traceParent.SpanID,
+			traceID: traceParent.TraceID,
 		}, nil
 	default:
 		return nil, opentracing.ErrInvalidCarrier

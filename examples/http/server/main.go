@@ -40,9 +40,12 @@ func main() {
 func traceHandler(tracer *opentelemetry.Tracer, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		extractor := headers.NewExtractor(r.Header)
-		ctx := extractor.Extract(r.Context())
-
-		ctx = tracer.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path))
+		parentSpan := extractor.Extract(r.Context())
+		opts := []opentelemetry.StartSpanOption{
+			opentelemetry.WithTraceID(parentSpan.TraceID),
+			opentelemetry.WithParentID(parentSpan.ID),
+		}
+		ctx := tracer.StartSpan(context.Background(), fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
 		defer opentelemetry.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)

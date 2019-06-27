@@ -30,27 +30,22 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 		opt.Apply(&config)
 	}
 
-	ctx := context.Background()
+	var sso []opentelemetry.StartSpanOption
 
 	for _, ref := range config.References {
 		if sc, ok := ref.ReferencedContext.(*SpanContext); ok {
-			var parentSpan opentelemetry.ParentSpan
-
-			if id, ok := opentelemetry.SpanIDFromContext(sc.span.ctx); ok {
-				parentSpan.ID = id
+			parentOpts := []opentelemetry.StartSpanOption{
+				opentelemetry.WithTraceID(sc.traceID),
+				opentelemetry.WithParentID(sc.id),
 			}
 
-			if traceID, ok := opentelemetry.TraceIDFromContext(sc.span.ctx); ok {
-				parentSpan.TraceID = traceID
-			}
-
-			ctx = opentelemetry.ContextWithParentSpan(ctx, parentSpan)
+			sso = append(sso, parentOpts...)
 
 			break
 		}
 	}
 
-	ctx = t.tracer.StartSpan(ctx, operationName)
+	ctx := t.tracer.StartSpan(context.Background(), operationName, sso...)
 
 	return &Span{
 		tracer: t,
