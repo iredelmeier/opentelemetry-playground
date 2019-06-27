@@ -33,6 +33,8 @@ func (e *Exporter) ExportSpan(span opentelemetry.Span) {
 		TraceID:       hex.EncodeToString(span.TraceID[:]),
 		ParentID:      parentID,
 		OperationName: span.OperationName,
+		StartTime:     span.StartTime,
+		EndTime:       span.StartTime.Add(span.Duration),
 		Tags:          span.Tags,
 	}); err != nil {
 		e.errorHandler.Handle(err)

@@ -1,5 +1,7 @@
 package internal
 
+import "time"
+
 type StartSpanOption func(*startSpanConfig)
 
 func WithID(id [8]byte) StartSpanOption {
@@ -26,6 +28,12 @@ func WithOperationName(operationName string) StartSpanOption {
 	}
 }
 
+func WithStartTime(startTime time.Time) StartSpanOption {
+	return func(c *startSpanConfig) {
+		c.startTime = startTime
+	}
+}
+
 func WithFinishSpan(finishSpan FinishSpan) StartSpanOption {
 	return func(c *startSpanConfig) {
 		c.finishSpan = finishSpan
@@ -37,12 +45,14 @@ type startSpanConfig struct {
 	traceID       [16]byte
 	parentID      [8]byte
 	operationName string
+	startTime     time.Time
 	finishSpan    FinishSpan
 }
 
 func newStartSpanConfig(opts ...StartSpanOption) *startSpanConfig {
 	c := &startSpanConfig{}
 	defaultOpts := []StartSpanOption{
+		WithStartTime(time.Now()),
 		WithFinishSpan(defaultFinishSpan),
 	}
 
