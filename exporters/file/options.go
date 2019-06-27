@@ -2,27 +2,27 @@ package file
 
 import "os"
 
-type Option func(*Config)
+type Option func(*config)
 
 func WithFile(file *os.File) Option {
-	return func(c *Config) {
+	return func(c *config) {
 		c.file = file
 	}
 }
 
 func WithErrorHandler(errorHandler ErrorHandler) Option {
-	return func(c *Config) {
+	return func(c *config) {
 		c.errorHandler = errorHandler
 	}
 }
 
-type Config struct {
+type config struct {
 	file         *os.File
 	errorHandler ErrorHandler
 }
 
-func newConfig(opts ...Option) *Config {
-	c := &Config{}
+func newConfig(opts ...Option) *config {
+	c := &config{}
 	defaultOpts := []Option{
 		WithFile(os.Stdout),
 	}
