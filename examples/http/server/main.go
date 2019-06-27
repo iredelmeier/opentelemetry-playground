@@ -13,12 +13,13 @@ import (
 )
 
 func main() {
-	exporter := file.NewExporter()
+	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
+	defer exporter.Close(context.Background())
+
 	tracerOpts := []opentelemetry.TracerOption{
 		opentelemetry.WithSpanExporter(exporter),
 	}
 	tracer := opentelemetry.NewTracer(tracerOpts...)
-	defer tracer.Close(context.Background())
 
 	serveMux := http.NewServeMux()
 

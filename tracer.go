@@ -2,13 +2,11 @@ package opentelemetry
 
 import (
 	"context"
-	"sync"
 
 	"github.com/iredelmeier/opentelemetry-playground/internal"
 )
 
 type Tracer struct {
-	lock     *sync.RWMutex
 	exporter SpanExporter
 }
 
@@ -16,18 +14,8 @@ func NewTracer(opts ...TracerOption) *Tracer {
 	c := newTracerConfig(opts...)
 
 	return &Tracer{
-		lock:     &sync.RWMutex{},
 		exporter: c.exporter,
 	}
-}
-
-func (t *Tracer) Close(ctx context.Context) error {
-	t.lock.Lock()
-	defer t.lock.Unlock()
-
-	t.exporter = NoopSpanExporter{}
-
-	return nil
 }
 
 func (t *Tracer) StartSpan(ctx context.Context, operationName string, opts ...StartSpanOption) context.Context {
@@ -55,11 +43,5 @@ func (t *Tracer) StartSpan(ctx context.Context, operationName string, opts ...St
 }
 
 func (t *Tracer) finishSpan(ctx context.Context, span *internal.Span) {
-	t.lock.RLock()
-
-	go func() {
-		defer t.lock.RUnlock()
-
-		t.exporter.ExportSpan(newSpan(ctx, span))
-	}()
+	t.exporter.ExportSpan(newSpan(ctx, span))
 }
