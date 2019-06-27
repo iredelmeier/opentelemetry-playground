@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"context"
 	"sync"
 
 	"github.com/gofrs/uuid"
@@ -58,8 +59,8 @@ func (s *Span) ParentID() [8]byte {
 	return s.parentID
 }
 
-func (s *Span) Finish() {
+func (s *Span) Finish(ctx context.Context) {
 	s.finishOnce.Do(func() {
-		s.finishSpan(s)
+		s.finishSpan(ctx, s)
 	})
 }

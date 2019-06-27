@@ -8,6 +8,6 @@ import (
 
 func FinishSpan(ctx context.Context) {
 	if state, ok := internal.StateFromContext(ctx); ok {
-		state.Span().Finish()
+		state.Span().Finish(ctx)
 	}
 }

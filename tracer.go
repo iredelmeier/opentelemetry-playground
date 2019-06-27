@@ -64,7 +64,7 @@ func (t *Tracer) StartSpan(ctx context.Context, operationName string, opts ...St
 	return ctx
 }
 
-func (t *Tracer) finishSpan(span *internal.Span) {
+func (t *Tracer) finishSpan(ctx context.Context, span *internal.Span) {
 	s := newSpan(span)
 
 	for _, exporter := range t.exporters {
