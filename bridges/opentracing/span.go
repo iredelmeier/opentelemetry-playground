@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/iredelmeier/opentelemetry-playground"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
@@ -41,7 +40,7 @@ func (s Span) SetOperationName(operationName string) opentracing.Span {
 
 func (s Span) SetTag(key string, value interface{}) opentracing.Span {
 	if b, err := json.Marshal(value); err == nil {
-		s.ctx = opentelemetry.ContextWithAttribute(s.ctx, key, string(b))
+		trace.SetAttribute(s.ctx, key, string(b))
 	}
 
 	return s
@@ -52,6 +51,7 @@ func (s Span) LogFields(fields ...log.Field) {
 		Timestamp: time.Now(),
 		Fields:    fields,
 	})
+
 }
 
 func (s Span) LogKV(alternatingKeyValues ...interface{}) {

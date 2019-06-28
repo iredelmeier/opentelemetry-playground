@@ -6,7 +6,6 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/iredelmeier/opentelemetry-playground"
 	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/headers"
@@ -45,12 +44,12 @@ func traceHandler(exporter trace.SpanExporter, handler http.HandlerFunc) http.Ha
 
 		ctx := trace.ContextWithSpanExporter(r.Context(), exporter)
 
-		ctx = opentelemetry.ContextWithAttribute(ctx, "kind", "server")
-
 		ctx = trace.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
 		defer trace.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)
+
+		trace.SetAttribute(ctx, "kind", "server")
 
 		handler(w, r)
 	}
