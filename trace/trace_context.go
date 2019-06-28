@@ -1,4 +1,4 @@
-package opentelemetry
+package trace
 
 type TraceContext struct {
 	TraceID TraceID

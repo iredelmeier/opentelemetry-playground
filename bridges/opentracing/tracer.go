@@ -3,7 +3,7 @@ package opentracing
 import (
 	"context"
 
-	"github.com/iredelmeier/opentelemetry-playground"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/opentracing/opentracing-go"
 )
 
@@ -12,7 +12,7 @@ const (
 )
 
 type Tracer struct {
-	exporter opentelemetry.SpanExporter
+	exporter trace.SpanExporter
 }
 
 func NewTracer(opts ...TracerOption) opentracing.Tracer {
@@ -30,15 +30,15 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 		opt.Apply(&config)
 	}
 
-	sso := []opentelemetry.StartSpanOption{
-		opentelemetry.WithStartTime(config.StartTime),
+	sso := []trace.StartSpanOption{
+		trace.WithStartTime(config.StartTime),
 	}
 
 	for _, ref := range config.References {
 		if sc, ok := ref.ReferencedContext.(*SpanContext); ok {
-			parentOpts := []opentelemetry.StartSpanOption{
-				opentelemetry.WithTraceID(sc.traceID),
-				opentelemetry.WithParentID(sc.id),
+			parentOpts := []trace.StartSpanOption{
+				trace.WithTraceID(sc.traceID),
+				trace.WithParentID(sc.id),
 			}
 
 			sso = append(sso, parentOpts...)
@@ -47,9 +47,9 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 		}
 	}
 
-	ctx := opentelemetry.ContextWithSpanExporter(context.Background(), t.exporter)
+	ctx := trace.ContextWithSpanExporter(context.Background(), t.exporter)
 
-	ctx = opentelemetry.StartSpan(ctx, operationName, sso...)
+	ctx = trace.StartSpan(ctx, operationName, sso...)
 
 	return &Span{
 		tracer: t,

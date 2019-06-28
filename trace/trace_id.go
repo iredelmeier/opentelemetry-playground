@@ -1,9 +1,9 @@
-package opentelemetry
+package trace
 
 import (
 	"context"
 
-	"github.com/iredelmeier/opentelemetry-playground/internal"
+	"github.com/iredelmeier/opentelemetry-playground/trace/internal"
 )
 
 const TraceIDSize = 16

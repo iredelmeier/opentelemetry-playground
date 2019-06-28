@@ -1,10 +1,11 @@
-package opentelemetry
+package trace
 
 import (
 	"context"
 	"time"
 
-	"github.com/iredelmeier/opentelemetry-playground/internal"
+	rootinternal "github.com/iredelmeier/opentelemetry-playground/internal"
+	"github.com/iredelmeier/opentelemetry-playground/trace/internal"
 )
 
 type Span struct {
@@ -49,7 +50,7 @@ func finishSpan(ctx context.Context, span *internal.Span) {
 	if exporter, ok := SpanExporterFromContext(ctx); ok {
 		tags := make(map[string]string)
 
-		if kv, ok := internal.KeyValuesFromContext(ctx); ok {
+		if kv, ok := rootinternal.KeyValuesFromContext(ctx); ok {
 			for _, entry := range kv.Entries() {
 				tags[entry.Key] = entry.Value
 			}

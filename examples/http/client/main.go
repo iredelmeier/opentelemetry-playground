@@ -11,10 +11,11 @@ import (
 	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/headers"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 )
 
 func main() {
-	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
+	exporter := trace.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
 	req := &http.Request{
@@ -27,9 +28,9 @@ func main() {
 		},
 	}
 
-	ctx := opentelemetry.ContextWithSpanExporter(req.Context(), exporter)
+	ctx := trace.ContextWithSpanExporter(req.Context(), exporter)
 
-	ctx = opentelemetry.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", req.URL))
+	ctx = trace.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", req.URL))
 	ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "client")
 
 	req = req.WithContext(ctx)
@@ -49,7 +50,7 @@ func main() {
 
 	res.Body.Close()
 
-	opentelemetry.FinishSpan(ctx)
+	trace.FinishSpan(ctx)
 
 	fmt.Printf("%s", body)
 }

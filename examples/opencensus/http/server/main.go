@@ -5,22 +5,22 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/iredelmeier/opentelemetry-playground"
 	"github.com/iredelmeier/opentelemetry-playground/bridges/opencensus"
 	"github.com/iredelmeier/opentelemetry-playground/examples/opencensus/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"go.opencensus.io/plugin/ochttp"
-	"go.opencensus.io/trace"
+	octrace "go.opencensus.io/trace"
 )
 
 func main() {
-	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
+	exporter := trace.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
 	ocExporter := opencensus.NewExporter(opencensus.WithSpanExporter(exporter))
 
-	trace.RegisterExporter(ocExporter)
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+	octrace.RegisterExporter(ocExporter)
+	octrace.ApplyConfig(octrace.Config{DefaultSampler: octrace.AlwaysSample()})
 
 	serveMux := http.NewServeMux()
 

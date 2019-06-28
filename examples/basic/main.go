@@ -3,19 +3,19 @@ package main
 import (
 	"context"
 
-	"github.com/iredelmeier/opentelemetry-playground"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 )
 
 func main() {
-	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
+	exporter := trace.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
-	ctx := opentelemetry.ContextWithSpanExporter(context.Background(), exporter)
+	ctx := trace.ContextWithSpanExporter(context.Background(), exporter)
 
-	parentCtx := opentelemetry.StartSpan(ctx, "parent")
-	defer opentelemetry.FinishSpan(parentCtx)
+	parentCtx := trace.StartSpan(ctx, "parent")
+	defer trace.FinishSpan(parentCtx)
 
-	childCtx := opentelemetry.StartSpan(parentCtx, "child")
-	defer opentelemetry.FinishSpan(childCtx)
+	childCtx := trace.StartSpan(parentCtx, "child")
+	defer trace.FinishSpan(childCtx)
 }

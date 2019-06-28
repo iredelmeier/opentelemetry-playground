@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/iredelmeier/opentelemetry-playground"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/lightstep/tracecontext.go"
 	"github.com/lightstep/tracecontext.go/traceparent"
 )
@@ -20,8 +20,8 @@ func NewInjector(headers http.Header) *Injector {
 }
 
 func (i *Injector) Inject(ctx context.Context) {
-	if traceID, ok := opentelemetry.TraceIDFromContext(ctx); ok {
-		if spanID, ok := opentelemetry.SpanIDFromContext(ctx); ok {
+	if traceID, ok := trace.TraceIDFromContext(ctx); ok {
+		if spanID, ok := trace.SpanIDFromContext(ctx); ok {
 			traceParent := traceparent.TraceParent{
 				Version: traceparent.Version,
 				TraceID: traceID,

@@ -5,7 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 
-	"github.com/iredelmeier/opentelemetry-playground"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 )
 
 type Exporter struct {
@@ -22,7 +22,7 @@ func NewExporter(opts ...Option) *Exporter {
 	}
 }
 
-func (e *Exporter) ExportSpan(span opentelemetry.Span) {
+func (e *Exporter) ExportSpan(span trace.Span) {
 	var parentID string
 	if id := span.ParentID; !isEmptySpanID(id) {
 		parentID = hex.EncodeToString(id[:])

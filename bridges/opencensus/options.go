@@ -1,23 +1,23 @@
 package opencensus
 
-import "github.com/iredelmeier/opentelemetry-playground"
+import "github.com/iredelmeier/opentelemetry-playground/trace"
 
 type Option func(*config)
 
-func WithSpanExporter(spanExporter opentelemetry.SpanExporter) Option {
+func WithSpanExporter(spanExporter trace.SpanExporter) Option {
 	return func(c *config) {
 		c.spanExporter = spanExporter
 	}
 }
 
 type config struct {
-	spanExporter opentelemetry.SpanExporter
+	spanExporter trace.SpanExporter
 }
 
 func newConfig(opts ...Option) *config {
 	c := &config{}
 	defaultOpts := []Option{
-		WithSpanExporter(opentelemetry.NoopSpanExporter{}),
+		WithSpanExporter(trace.NoopSpanExporter{}),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {

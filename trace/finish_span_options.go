@@ -1,9 +1,9 @@
-package opentelemetry
+package trace
 
 import (
 	"time"
 
-	"github.com/iredelmeier/opentelemetry-playground/internal"
+	"github.com/iredelmeier/opentelemetry-playground/trace/internal"
 )
 
 type FinishSpanOption func(*finishSpanConfig)

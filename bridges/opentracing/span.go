@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/iredelmeier/opentelemetry-playground"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/log"
 )
@@ -20,17 +21,17 @@ func (s *Span) Finish() {
 }
 
 func (s *Span) FinishWithOptions(opts opentracing.FinishOptions) {
-	opentelemetry.FinishSpan(s.ctx, opentelemetry.WithFinishTime(opts.FinishTime))
+	trace.FinishSpan(s.ctx, trace.WithFinishTime(opts.FinishTime))
 }
 
 func (s *Span) Context() opentracing.SpanContext {
 	spanContext := &SpanContext{}
 
-	if id, ok := opentelemetry.SpanIDFromContext(s.ctx); ok {
+	if id, ok := trace.SpanIDFromContext(s.ctx); ok {
 		spanContext.id = id
 	}
 
-	if traceID, ok := opentelemetry.TraceIDFromContext(s.ctx); ok {
+	if traceID, ok := trace.TraceIDFromContext(s.ctx); ok {
 		spanContext.traceID = traceID
 	}
 

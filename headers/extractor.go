@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/iredelmeier/opentelemetry-playground"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/lightstep/tracecontext.go"
 )
 
@@ -18,13 +18,13 @@ func NewExtractor(headers http.Header) *Extractor {
 	}
 }
 
-func (e *Extractor) Extract(ctx context.Context) opentelemetry.TraceContext {
+func (e *Extractor) Extract(ctx context.Context) trace.TraceContext {
 	traceContext, err := tracecontext.FromHeaders(e.headers)
 	if err != nil {
-		return opentelemetry.TraceContext{}
+		return trace.TraceContext{}
 	}
 
-	return opentelemetry.TraceContext{
+	return trace.TraceContext{
 		TraceID: traceContext.TraceParent.TraceID,
 		SpanID:  traceContext.TraceParent.SpanID,
 	}
