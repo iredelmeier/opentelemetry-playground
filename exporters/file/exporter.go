@@ -34,7 +34,7 @@ func (e *Exporter) ExportSpan(span opentelemetry.Span) {
 		ParentID:      parentID,
 		OperationName: span.OperationName,
 		StartTime:     span.StartTime,
-		FinishTime:    span.StartTime.Add(span.Duration),
+		FinishTime:    span.FinishTime,
 		Tags:          span.Tags,
 	}); err != nil {
 		e.errorHandler.Handle(err)
