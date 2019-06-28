@@ -18,4 +18,4 @@ while read -r module; do
       go build ./...
     fi
   }
-done < <(find "$ROOT_DIR" -name "go.mod" -printf "%h\\n")
+done < <(find "$ROOT_DIR" -name "go.mod" -exec dirname {} \;)
