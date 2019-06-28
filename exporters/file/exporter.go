@@ -29,8 +29,8 @@ func (e *Exporter) ExportSpan(span opentelemetry.Span) {
 	}
 
 	if err := e.encoder.Encode(Span{
-		ID:            hex.EncodeToString(span.ID[:]),
-		TraceID:       hex.EncodeToString(span.TraceID[:]),
+		ID:            hex.EncodeToString(span.TraceContext.SpanID[:]),
+		TraceID:       hex.EncodeToString(span.TraceContext.TraceID[:]),
 		ParentID:      parentID,
 		OperationName: span.OperationName,
 		StartTime:     span.StartTime,
