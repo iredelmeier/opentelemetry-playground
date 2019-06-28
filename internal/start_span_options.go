@@ -52,12 +52,15 @@ type startSpanConfig struct {
 func newStartSpanConfig(opts ...StartSpanOption) *startSpanConfig {
 	c := &startSpanConfig{}
 	defaultOpts := []StartSpanOption{
-		WithStartTime(time.Now()),
 		WithFinishSpan(defaultFinishSpan),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {
 		opt(c)
+	}
+
+	if c.startTime.IsZero() {
+		c.startTime = time.Now()
 	}
 
 	return c

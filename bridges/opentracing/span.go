@@ -20,7 +20,7 @@ func (s *Span) Finish() {
 }
 
 func (s *Span) FinishWithOptions(opts opentracing.FinishOptions) {
-	opentelemetry.FinishSpan(s.ctx)
+	opentelemetry.FinishSpan(s.ctx, opentelemetry.WithFinishTime(opts.FinishTime))
 }
 
 func (s *Span) Context() opentracing.SpanContext {
