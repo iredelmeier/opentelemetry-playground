@@ -13,7 +13,7 @@ type Span struct {
 	ParentID      SpanID
 	OperationName string
 	StartTime     time.Time
-	Duration      time.Duration
+	FinishTime    time.Time
 	Tags          map[string]string
 }
 
@@ -62,7 +62,7 @@ func finishSpan(ctx context.Context, span *internal.Span) {
 			ParentID:      span.ParentID(),
 			OperationName: span.OperationName(),
 			StartTime:     span.StartTime(),
-			Duration:      time.Since(span.StartTime()),
+			FinishTime:    time.Now(),
 			Tags:          tags,
 		})
 	}
