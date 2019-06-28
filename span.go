@@ -40,7 +40,7 @@ func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOptio
 	return internal.ContextWithSpan(ctx, span)
 }
 
-func FinishSpan(ctx context.Context) {
+func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 	if span, ok := internal.SpanFromContext(ctx); ok {
 		span.Finish(ctx)
 	}
@@ -62,7 +62,7 @@ func finishSpan(ctx context.Context, span *internal.Span) {
 			ParentID:      span.ParentID(),
 			OperationName: span.OperationName(),
 			StartTime:     span.StartTime(),
-			FinishTime:    time.Now(),
+			FinishTime:    span.FinishTime(),
 			Tags:          tags,
 		})
 	}

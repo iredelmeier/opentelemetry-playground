@@ -1,6 +1,8 @@
 package opentelemetry
 
 import (
+	"time"
+
 	"github.com/iredelmeier/opentelemetry-playground/internal"
 )
 
@@ -21,6 +23,12 @@ func WithTraceID(traceID TraceID) StartSpanOption {
 func WithParentID(parentID SpanID) StartSpanOption {
 	return func(c *startSpanConfig) {
 		c.opts = append(c.opts, internal.WithParentID(parentID))
+	}
+}
+
+func WithStartTime(startTime time.Time) StartSpanOption {
+	return func(c *startSpanConfig) {
+		c.opts = append(c.opts, internal.WithStartTime(startTime))
 	}
 }
 

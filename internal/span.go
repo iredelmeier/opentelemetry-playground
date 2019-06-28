@@ -14,6 +14,7 @@ type Span struct {
 	parentID      [8]byte
 	operationName string
 	startTime     time.Time
+	finishTime    time.Time
 	finishOnce    *sync.Once
 	finishSpan    FinishSpan
 }
@@ -66,8 +67,16 @@ func (s *Span) StartTime() time.Time {
 	return s.startTime
 }
 
-func (s *Span) Finish(ctx context.Context) {
+func (s *Span) FinishTime() time.Time {
+	return s.finishTime
+}
+
+func (s *Span) Finish(ctx context.Context, opts ...FinishSpanOption) {
 	s.finishOnce.Do(func() {
+		c := newFinishSpanConfig(opts...)
+
+		s.finishTime = c.finishTime
+
 		s.finishSpan(ctx, s)
 	})
 }

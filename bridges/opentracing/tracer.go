@@ -30,7 +30,9 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 		opt.Apply(&config)
 	}
 
-	var sso []opentelemetry.StartSpanOption
+	sso := []opentelemetry.StartSpanOption{
+		opentelemetry.WithStartTime(config.StartTime),
+	}
 
 	for _, ref := range config.References {
 		if sc, ok := ref.ReferencedContext.(*SpanContext); ok {
