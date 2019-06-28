@@ -14,12 +14,12 @@ type finishSpanConfig struct {
 	finishTime time.Time
 }
 
-func newFinishSpanConfig(opts ...FinishSpanOption) *finishSpanConfig {
-	c := &finishSpanConfig{}
+func newFinishSpanConfig(opts ...FinishSpanOption) finishSpanConfig {
+	var c finishSpanConfig
 	var defaultOpts []FinishSpanOption
 
 	for _, opt := range append(defaultOpts, opts...) {
-		opt(c)
+		opt(&c)
 	}
 
 	if c.finishTime.IsZero() {

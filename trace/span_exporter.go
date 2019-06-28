@@ -30,14 +30,14 @@ type NonBlockingSpanExporter struct {
 	exporter SpanExporter
 }
 
-func NewNonBlockingSpanExporter(wrappedExporter SpanExporter) *NonBlockingSpanExporter {
-	return &NonBlockingSpanExporter{
+func NewNonBlockingSpanExporter(wrappedExporter SpanExporter) NonBlockingSpanExporter {
+	return NonBlockingSpanExporter{
 		lock:     &sync.RWMutex{},
 		exporter: wrappedExporter,
 	}
 }
 
-func (e *NonBlockingSpanExporter) ExportSpan(span Span) {
+func (e NonBlockingSpanExporter) ExportSpan(span Span) {
 	e.lock.RLock()
 
 	go func() {

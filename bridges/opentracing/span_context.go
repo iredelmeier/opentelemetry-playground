@@ -15,9 +15,9 @@ type SpanContext struct {
 	traceContext trace.TraceContext
 }
 
-func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {}
+func (sc SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {}
 
-func (sc *SpanContext) traceParent() traceparent.TraceParent {
+func (sc SpanContext) traceParent() traceparent.TraceParent {
 	return traceparent.TraceParent{
 		Version: traceparent.Version,
 		SpanID:  sc.traceContext.SpanID,
@@ -28,7 +28,7 @@ func (sc *SpanContext) traceParent() traceparent.TraceParent {
 	}
 }
 
-func (sc *SpanContext) injectBinary(carrier interface{}) error {
+func (sc SpanContext) injectBinary(carrier interface{}) error {
 	switch c := carrier.(type) {
 	case io.Writer:
 		traceParent := sc.traceParent()
@@ -43,7 +43,7 @@ func (sc *SpanContext) injectBinary(carrier interface{}) error {
 	}
 }
 
-func (sc *SpanContext) injectTextMap(carrier interface{}) error {
+func (sc SpanContext) injectTextMap(carrier interface{}) error {
 	switch c := carrier.(type) {
 	case http.Header:
 		traceContext := tracecontext.TraceContext{
@@ -64,41 +64,41 @@ func (sc *SpanContext) injectTextMap(carrier interface{}) error {
 	}
 }
 
-func extractBinary(carrier interface{}) (*SpanContext, error) {
+func extractBinary(carrier interface{}) (SpanContext, error) {
 	switch c := carrier.(type) {
 	case io.Reader:
 		b, err := ioutil.ReadAll(c)
 		if err != nil {
-			return nil, err
+			return SpanContext{}, err
 		}
 
 		traceParent, err := traceparent.Parse(b)
 		if err != nil {
-			return nil, err
+			return SpanContext{}, err
 		}
 
-		return &SpanContext{
+		return SpanContext{
 			traceContext: trace.TraceContext{
 				TraceID: traceParent.TraceID,
 				SpanID:  traceParent.SpanID,
 			},
 		}, nil
 	default:
-		return nil, opentracing.ErrInvalidCarrier
+		return SpanContext{}, opentracing.ErrInvalidCarrier
 	}
 }
 
-func extractTextMap(carrier interface{}) (*SpanContext, error) {
+func extractTextMap(carrier interface{}) (SpanContext, error) {
 	switch c := carrier.(type) {
 	case http.Header:
 		traceContext, err := tracecontext.FromHeaders(c)
 		if err != nil {
-			return nil, err
+			return SpanContext{}, err
 		}
 
 		traceParent := traceContext.TraceParent
 
-		return &SpanContext{
+		return SpanContext{
 			traceContext: trace.TraceContext{
 				TraceID: traceParent.TraceID,
 				SpanID:  traceParent.SpanID,
@@ -120,16 +120,16 @@ func extractTextMap(carrier interface{}) (*SpanContext, error) {
 
 			return nil
 		}); err != nil {
-			return nil, err
+			return SpanContext{}, err
 		}
 
-		return &SpanContext{
+		return SpanContext{
 			traceContext: trace.TraceContext{
 				TraceID: traceParent.TraceID,
 				SpanID:  traceParent.SpanID,
 			},
 		}, nil
 	default:
-		return nil, opentracing.ErrInvalidCarrier
+		return SpanContext{}, opentracing.ErrInvalidCarrier
 	}
 }

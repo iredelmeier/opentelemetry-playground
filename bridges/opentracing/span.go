@@ -12,20 +12,20 @@ import (
 )
 
 type Span struct {
-	tracer *Tracer
+	tracer Tracer
 	ctx    context.Context
 }
 
-func (s *Span) Finish() {
+func (s Span) Finish() {
 	s.FinishWithOptions(opentracing.FinishOptions{})
 }
 
-func (s *Span) FinishWithOptions(opts opentracing.FinishOptions) {
+func (s Span) FinishWithOptions(opts opentracing.FinishOptions) {
 	trace.FinishSpan(s.ctx, trace.WithFinishTime(opts.FinishTime))
 }
 
-func (s *Span) Context() opentracing.SpanContext {
-	spanContext := &SpanContext{}
+func (s Span) Context() opentracing.SpanContext {
+	spanContext := SpanContext{}
 
 	if traceContext, ok := trace.TraceContextFromContext(s.ctx); ok {
 		spanContext.traceContext = traceContext
@@ -34,12 +34,12 @@ func (s *Span) Context() opentracing.SpanContext {
 	return spanContext
 }
 
-func (s *Span) SetOperationName(operationName string) opentracing.Span {
+func (s Span) SetOperationName(operationName string) opentracing.Span {
 	// TODO
 	return s
 }
 
-func (s *Span) SetTag(key string, value interface{}) opentracing.Span {
+func (s Span) SetTag(key string, value interface{}) opentracing.Span {
 	if b, err := json.Marshal(value); err == nil {
 		s.ctx = opentelemetry.ContextWithKeyValue(s.ctx, key, string(b))
 	}
@@ -47,14 +47,14 @@ func (s *Span) SetTag(key string, value interface{}) opentracing.Span {
 	return s
 }
 
-func (s *Span) LogFields(fields ...log.Field) {
+func (s Span) LogFields(fields ...log.Field) {
 	s.log(opentracing.LogRecord{
 		Timestamp: time.Now(),
 		Fields:    fields,
 	})
 }
 
-func (s *Span) LogKV(alternatingKeyValues ...interface{}) {
+func (s Span) LogKV(alternatingKeyValues ...interface{}) {
 	fields, err := log.InterleavedKVToFields(alternatingKeyValues...)
 	if err != nil {
 		s.LogFields(log.Error(err), log.String("function", "LogKV"))
@@ -64,25 +64,25 @@ func (s *Span) LogKV(alternatingKeyValues ...interface{}) {
 	s.LogFields(fields...)
 }
 
-func (s *Span) SetBaggageItem(restrictedKey, value string) opentracing.Span {
+func (s Span) SetBaggageItem(restrictedKey, value string) opentracing.Span {
 	// TODO
 	return s
 }
 
-func (s *Span) BaggageItem(restrictedKey string) string {
+func (s Span) BaggageItem(restrictedKey string) string {
 	// TODO
 	return ""
 }
 
-func (s *Span) Tracer() opentracing.Tracer {
+func (s Span) Tracer() opentracing.Tracer {
 	return s.tracer
 }
 
-func (s *Span) LogEvent(event string) {
+func (s Span) LogEvent(event string) {
 	s.LogEventWithPayload(event, nil)
 }
 
-func (s *Span) LogEventWithPayload(event string, payload interface{}) {
+func (s Span) LogEventWithPayload(event string, payload interface{}) {
 	s.Log(opentracing.LogData{
 		Timestamp: time.Now(),
 		Event:     event,
@@ -90,10 +90,10 @@ func (s *Span) LogEventWithPayload(event string, payload interface{}) {
 	})
 }
 
-func (s *Span) Log(logData opentracing.LogData) {
+func (s Span) Log(logData opentracing.LogData) {
 	s.log(logData.ToLogRecord())
 }
 
-func (s *Span) log(logRecord opentracing.LogRecord) {
+func (s Span) log(logRecord opentracing.LogRecord) {
 	// TODO
 }

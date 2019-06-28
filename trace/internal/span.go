@@ -19,10 +19,10 @@ type Span struct {
 	finishSpan    FinishSpan
 }
 
-func NewSpan(opts ...StartSpanOption) *Span {
+func NewSpan(opts ...StartSpanOption) Span {
 	c := newStartSpanConfig(opts...)
 
-	span := &Span{
+	span := Span{
 		id:            c.id,
 		traceID:       c.traceID,
 		parentID:      c.parentID,
@@ -47,31 +47,31 @@ func NewSpan(opts ...StartSpanOption) *Span {
 	return span
 }
 
-func (s *Span) OperationName() string {
+func (s Span) OperationName() string {
 	return s.operationName
 }
 
-func (s *Span) ID() [8]byte {
+func (s Span) ID() [8]byte {
 	return s.id
 }
 
-func (s *Span) TraceID() [16]byte {
+func (s Span) TraceID() [16]byte {
 	return s.traceID
 }
 
-func (s *Span) ParentID() [8]byte {
+func (s Span) ParentID() [8]byte {
 	return s.parentID
 }
 
-func (s *Span) StartTime() time.Time {
+func (s Span) StartTime() time.Time {
 	return s.startTime
 }
 
-func (s *Span) FinishTime() time.Time {
+func (s Span) FinishTime() time.Time {
 	return s.finishTime
 }
 
-func (s *Span) Finish(ctx context.Context, opts ...FinishSpanOption) {
+func (s Span) Finish(ctx context.Context, opts ...FinishSpanOption) {
 	s.finishOnce.Do(func() {
 		c := newFinishSpanConfig(opts...)
 

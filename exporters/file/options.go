@@ -21,18 +21,18 @@ type config struct {
 	errorHandler ErrorHandler
 }
 
-func newConfig(opts ...Option) *config {
-	c := &config{}
+func newConfig(opts ...Option) config {
+	var c config
 	defaultOpts := []Option{
 		WithFile(os.Stdout),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {
-		opt(c)
+		opt(&c)
 	}
 
 	if c.errorHandler == nil {
-		c.errorHandler = &DefaultErrorHandler{
+		c.errorHandler = DefaultErrorHandler{
 			file: c.file,
 		}
 	}

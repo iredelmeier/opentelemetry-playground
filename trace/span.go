@@ -45,7 +45,7 @@ func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 	}
 }
 
-func finishSpan(ctx context.Context, span *internal.Span) {
+func finishSpan(ctx context.Context, span internal.Span) {
 	if exporter, ok := SpanExporterFromContext(ctx); ok {
 		tags := make(map[string]string)
 

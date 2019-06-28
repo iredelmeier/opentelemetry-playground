@@ -10,6 +10,6 @@ type DefaultErrorHandler struct {
 	file *os.File
 }
 
-func (eh *DefaultErrorHandler) Handle(err error) {
+func (eh DefaultErrorHandler) Handle(err error) {
 	_, _ = eh.file.WriteString(err.Error())
 }

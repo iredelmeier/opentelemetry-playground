@@ -13,13 +13,13 @@ type Injector struct {
 	headers http.Header
 }
 
-func NewInjector(headers http.Header) *Injector {
-	return &Injector{
+func NewInjector(headers http.Header) Injector {
+	return Injector{
 		headers: headers,
 	}
 }
 
-func (i *Injector) Inject(ctx context.Context) {
+func (i Injector) Inject(ctx context.Context) {
 	if traceContext, ok := trace.TraceContextFromContext(ctx); ok {
 		traceParent := traceparent.TraceParent{
 			Version: traceparent.Version,

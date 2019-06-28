@@ -13,16 +13,16 @@ type Exporter struct {
 	errorHandler ErrorHandler
 }
 
-func NewExporter(opts ...Option) *Exporter {
+func NewExporter(opts ...Option) Exporter {
 	c := newConfig(opts...)
 
-	return &Exporter{
+	return Exporter{
 		encoder:      json.NewEncoder(c.file),
 		errorHandler: c.errorHandler,
 	}
 }
 
-func (e *Exporter) ExportSpan(span trace.Span) {
+func (e Exporter) ExportSpan(span trace.Span) {
 	var parentID string
 	if id := span.ParentID; !isEmptySpanID(id) {
 		parentID = hex.EncodeToString(id[:])

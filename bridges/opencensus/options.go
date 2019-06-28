@@ -14,14 +14,14 @@ type config struct {
 	spanExporter trace.SpanExporter
 }
 
-func newConfig(opts ...Option) *config {
-	c := &config{}
+func newConfig(opts ...Option) config {
+	var c config
 	defaultOpts := []Option{
 		WithSpanExporter(trace.NoopSpanExporter{}),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {
-		opt(c)
+		opt(&c)
 	}
 
 	return c
