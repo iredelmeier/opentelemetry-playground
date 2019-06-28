@@ -3,12 +3,12 @@ package opencensus
 import (
 	"context"
 
-	"github.com/iredelmeier/opentelemetry-playground"
-	"go.opencensus.io/trace"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
+	octrace "go.opencensus.io/trace"
 )
 
 type Exporter struct {
-	spanExporter opentelemetry.SpanExporter
+	spanExporter trace.SpanExporter
 }
 
 func NewExporter(opts ...Option) *Exporter {
@@ -19,20 +19,20 @@ func NewExporter(opts ...Option) *Exporter {
 	}
 }
 
-func (e *Exporter) ExportSpan(span *trace.SpanData) {
-	startOpts := []opentelemetry.StartSpanOption{
-		opentelemetry.WithID(opentelemetry.SpanID(span.SpanContext.SpanID)),
-		opentelemetry.WithTraceID(opentelemetry.TraceID(span.SpanContext.TraceID)),
-		opentelemetry.WithParentID(opentelemetry.SpanID(span.ParentSpanID)),
-		opentelemetry.WithStartTime(span.StartTime),
+func (e *Exporter) ExportSpan(span *octrace.SpanData) {
+	startOpts := []trace.StartSpanOption{
+		trace.WithID(trace.SpanID(span.SpanContext.SpanID)),
+		trace.WithTraceID(trace.TraceID(span.SpanContext.TraceID)),
+		trace.WithParentID(trace.SpanID(span.ParentSpanID)),
+		trace.WithStartTime(span.StartTime),
 	}
-	ctx := opentelemetry.ContextWithSpanExporter(context.Background(), e.spanExporter)
+	ctx := trace.ContextWithSpanExporter(context.Background(), e.spanExporter)
 
-	ctx = opentelemetry.StartSpan(ctx, span.Name, startOpts...)
+	ctx = trace.StartSpan(ctx, span.Name, startOpts...)
 
-	finishOpts := []opentelemetry.FinishSpanOption{
-		opentelemetry.WithFinishTime(span.EndTime),
+	finishOpts := []trace.FinishSpanOption{
+		trace.WithFinishTime(span.EndTime),
 	}
 
-	opentelemetry.FinishSpan(ctx, finishOpts...)
+	trace.FinishSpan(ctx, finishOpts...)
 }

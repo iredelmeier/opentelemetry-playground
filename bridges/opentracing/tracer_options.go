@@ -1,23 +1,23 @@
 package opentracing
 
-import "github.com/iredelmeier/opentelemetry-playground"
+import "github.com/iredelmeier/opentelemetry-playground/trace"
 
 type TracerOption func(*tracerConfig)
 
-func WithExporter(exporter opentelemetry.SpanExporter) TracerOption {
+func WithExporter(exporter trace.SpanExporter) TracerOption {
 	return func(c *tracerConfig) {
 		c.exporter = exporter
 	}
 }
 
 type tracerConfig struct {
-	exporter opentelemetry.SpanExporter
+	exporter trace.SpanExporter
 }
 
 func newTracerConfig(opts ...TracerOption) *tracerConfig {
 	c := &tracerConfig{}
 	defaultOpts := []TracerOption{
-		WithExporter(opentelemetry.NoopSpanExporter{}),
+		WithExporter(trace.NoopSpanExporter{}),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {

@@ -5,15 +5,15 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/iredelmeier/opentelemetry-playground"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/lightstep/tracecontext.go"
 	"github.com/lightstep/tracecontext.go/traceparent"
 	"github.com/opentracing/opentracing-go"
 )
 
 type SpanContext struct {
-	id      opentelemetry.SpanID
-	traceID opentelemetry.TraceID
+	id      trace.SpanID
+	traceID trace.TraceID
 }
 
 func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {}

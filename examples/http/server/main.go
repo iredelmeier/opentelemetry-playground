@@ -10,10 +10,11 @@ import (
 	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/headers"
+	"github.com/iredelmeier/opentelemetry-playground/trace"
 )
 
 func main() {
-	exporter := opentelemetry.NewNonBlockingSpanExporter(file.NewExporter())
+	exporter := trace.NewNonBlockingSpanExporter(file.NewExporter())
 	defer exporter.Close(context.Background())
 
 	serveMux := http.NewServeMux()
@@ -33,21 +34,21 @@ func main() {
 	}
 }
 
-func traceHandler(exporter opentelemetry.SpanExporter, handler http.HandlerFunc) http.HandlerFunc {
+func traceHandler(exporter trace.SpanExporter, handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		extractor := headers.NewExtractor(r.Header)
 		parentSpan := extractor.Extract(r.Context())
-		opts := []opentelemetry.StartSpanOption{
-			opentelemetry.WithTraceID(parentSpan.TraceID),
-			opentelemetry.WithParentID(parentSpan.SpanID),
+		opts := []trace.StartSpanOption{
+			trace.WithTraceID(parentSpan.TraceID),
+			trace.WithParentID(parentSpan.SpanID),
 		}
 
-		ctx := opentelemetry.ContextWithSpanExporter(r.Context(), exporter)
+		ctx := trace.ContextWithSpanExporter(r.Context(), exporter)
 
 		ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "server")
 
-		ctx = opentelemetry.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
-		defer opentelemetry.FinishSpan(ctx)
+		ctx = trace.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
+		defer trace.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)
 
