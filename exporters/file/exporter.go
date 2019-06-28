@@ -35,7 +35,7 @@ func (e Exporter) ExportSpan(span trace.Span) {
 		OperationName: span.OperationName,
 		StartTime:     span.StartTime,
 		FinishTime:    span.FinishTime,
-		Tags:          span.Tags,
+		Attributes:    span.Attributes,
 	}); err != nil {
 		e.errorHandler.Handle(err)
 	}
