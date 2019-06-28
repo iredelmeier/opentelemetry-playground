@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/iredelmeier/opentelemetry-playground/bridges/opencensus"
-	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
 	octrace "go.opencensus.io/trace"
 )

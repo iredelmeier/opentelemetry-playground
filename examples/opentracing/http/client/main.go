@@ -8,8 +8,8 @@ import (
 	"net/url"
 
 	bridge "github.com/iredelmeier/opentelemetry-playground/bridges/opentracing"
+	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/examples/opentracing/http/internal"
-	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"github.com/opentracing/opentracing-go"
 )

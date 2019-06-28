@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 
-	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
 )
 

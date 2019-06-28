@@ -8,8 +8,8 @@ import (
 	"net/url"
 
 	"github.com/iredelmeier/opentelemetry-playground/bridges/opencensus"
+	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/examples/opencensus/http/internal"
-	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"go.opencensus.io/plugin/ochttp"
 	octrace "go.opencensus.io/trace"
