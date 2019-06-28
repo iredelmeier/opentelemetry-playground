@@ -45,7 +45,7 @@ func traceHandler(exporter trace.SpanExporter, handler http.HandlerFunc) http.Ha
 
 		ctx := trace.ContextWithSpanExporter(r.Context(), exporter)
 
-		ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "server")
+		ctx = opentelemetry.ContextWithAttribute(ctx, "kind", "server")
 
 		ctx = trace.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
 		defer trace.FinishSpan(ctx)

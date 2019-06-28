@@ -31,7 +31,7 @@ func main() {
 	ctx := trace.ContextWithSpanExporter(req.Context(), exporter)
 
 	ctx = trace.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", req.URL))
-	ctx = opentelemetry.ContextWithKeyValue(ctx, "kind", "client")
+	ctx = opentelemetry.ContextWithAttribute(ctx, "kind", "client")
 
 	req = req.WithContext(ctx)
 

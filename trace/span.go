@@ -49,8 +49,8 @@ func finishSpan(ctx context.Context, span internal.Span) {
 	if exporter, ok := SpanExporterFromContext(ctx); ok {
 		tags := make(map[string]string)
 
-		if kv, ok := rootinternal.KeyValuesFromContext(ctx); ok {
-			for _, entry := range kv.Entries() {
+		if attributes, ok := rootinternal.AttributesFromContext(ctx); ok {
+			for _, entry := range attributes.Entries() {
 				tags[entry.Key] = entry.Value
 			}
 		}
