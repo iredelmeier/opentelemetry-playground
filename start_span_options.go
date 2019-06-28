@@ -1,29 +1,31 @@
 package opentelemetry
 
+import (
+	"github.com/iredelmeier/opentelemetry-playground/internal"
+)
+
 type StartSpanOption func(*startSpanConfig)
 
 func WithID(id SpanID) StartSpanOption {
 	return func(c *startSpanConfig) {
-		c.id = id
+		c.opts = append(c.opts, internal.WithID(id))
 	}
 }
 
 func WithTraceID(traceID TraceID) StartSpanOption {
 	return func(c *startSpanConfig) {
-		c.traceID = traceID
+		c.opts = append(c.opts, internal.WithTraceID(traceID))
 	}
 }
 
 func WithParentID(parentID SpanID) StartSpanOption {
 	return func(c *startSpanConfig) {
-		c.parentID = parentID
+		c.opts = append(c.opts, internal.WithParentID(parentID))
 	}
 }
 
 type startSpanConfig struct {
-	id       SpanID
-	traceID  TraceID
-	parentID SpanID
+	opts []internal.StartSpanOption
 }
 
 func newStartSpanConfig(opts ...StartSpanOption) *startSpanConfig {
