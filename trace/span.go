@@ -37,6 +37,12 @@ func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOptio
 	return internal.ContextWithSpan(ctx, span)
 }
 
+func SetAttribute(ctx context.Context, key string, value string) {
+	if span, ok := internal.SpanFromContext(ctx); ok {
+		span.SetAttribute(key, value)
+	}
+}
+
 func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 	if span, ok := internal.SpanFromContext(ctx); ok {
 		c := newFinishSpanConfig(opts...)
@@ -47,15 +53,7 @@ func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 
 func finishSpan(ctx context.Context, span internal.Span) {
 	if exporter, ok := SpanExporterFromContext(ctx); ok {
-		attributes := make(map[string]string)
-
-		if a, ok := rootinternal.AttributesFromContext(ctx); ok {
-			for _, attribute := range a.Entries() {
-				attributes[attribute.Key] = attribute.Value
-			}
-		}
-
-		exporter.ExportSpan(Span{
+		s := Span{
 			TraceContext: TraceContext{
 				TraceID: span.TraceID(),
 				SpanID:  span.ID(),
@@ -64,7 +62,19 @@ func finishSpan(ctx context.Context, span internal.Span) {
 			OperationName: span.OperationName(),
 			StartTime:     span.StartTime(),
 			FinishTime:    span.FinishTime(),
-			Attributes:    attributes,
-		})
+			Attributes:    make(map[string]string),
+		}
+
+		if attributes, ok := rootinternal.AttributesFromContext(ctx); ok {
+			for _, attribute := range attributes.Entries() {
+				s.Attributes[attribute.Key] = attribute.Value
+			}
+		}
+
+		for _, attribute := range span.Attributes() {
+			s.Attributes[attribute.Key] = attribute.Value
+		}
+
+		exporter.ExportSpan(s)
 	}
 }

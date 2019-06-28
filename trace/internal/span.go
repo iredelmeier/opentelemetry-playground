@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/iredelmeier/opentelemetry-playground/internal"
 )
 
 type Span struct {
@@ -13,6 +14,7 @@ type Span struct {
 	traceID       [16]byte
 	parentID      [8]byte
 	operationName string
+	attributes    internal.Attributes
 	startTime     time.Time
 	finishTime    time.Time
 	finishOnce    *sync.Once
@@ -27,6 +29,7 @@ func NewSpan(opts ...StartSpanOption) Span {
 		traceID:       c.traceID,
 		parentID:      c.parentID,
 		operationName: c.operationName,
+		attributes:    internal.NewAttributes(),
 		startTime:     c.startTime,
 		finishOnce:    &sync.Once{},
 		finishSpan:    c.finishSpan,
@@ -61,6 +64,18 @@ func (s Span) TraceID() [16]byte {
 
 func (s Span) ParentID() [8]byte {
 	return s.parentID
+}
+
+func (s Span) Attribute(key string) (string, bool) {
+	return s.attributes.Get(key)
+}
+
+func (s Span) SetAttribute(key string, value string) {
+	s.attributes.Set(key, value)
+}
+
+func (s Span) Attributes() []internal.Attribute {
+	return s.attributes.Entries()
 }
 
 func (s Span) StartTime() time.Time {
