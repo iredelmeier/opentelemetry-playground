@@ -8,7 +8,7 @@ import (
 	"net/url"
 
 	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
-	"github.com/iredelmeier/opentelemetry-playground/exporters/file"
+	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/headers"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
 )
