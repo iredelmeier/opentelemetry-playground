@@ -41,7 +41,7 @@ func (s Span) SetOperationName(operationName string) opentracing.Span {
 
 func (s Span) SetTag(key string, value interface{}) opentracing.Span {
 	if b, err := json.Marshal(value); err == nil {
-		s.ctx = opentelemetry.ContextWithKeyValue(s.ctx, key, string(b))
+		s.ctx = opentelemetry.ContextWithAttribute(s.ctx, key, string(b))
 	}
 
 	return s
