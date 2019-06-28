@@ -14,7 +14,7 @@ type Span struct {
 	OperationName string
 	StartTime     time.Time
 	FinishTime    time.Time
-	Tags          map[string]string
+	Attributes    map[string]string
 }
 
 func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOption) context.Context {
@@ -47,11 +47,11 @@ func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 
 func finishSpan(ctx context.Context, span internal.Span) {
 	if exporter, ok := SpanExporterFromContext(ctx); ok {
-		tags := make(map[string]string)
+		attributes := make(map[string]string)
 
-		if attributes, ok := rootinternal.AttributesFromContext(ctx); ok {
-			for _, entry := range attributes.Entries() {
-				tags[entry.Key] = entry.Value
+		if a, ok := rootinternal.AttributesFromContext(ctx); ok {
+			for _, attribute := range a.Entries() {
+				attributes[attribute.Key] = attribute.Value
 			}
 		}
 
@@ -64,7 +64,7 @@ func finishSpan(ctx context.Context, span internal.Span) {
 			OperationName: span.OperationName(),
 			StartTime:     span.StartTime(),
 			FinishTime:    span.FinishTime(),
-			Tags:          tags,
+			Attributes:    attributes,
 		})
 	}
 }
