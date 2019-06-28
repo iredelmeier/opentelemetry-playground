@@ -36,12 +36,12 @@ type startSpanConfig struct {
 	opts []internal.StartSpanOption
 }
 
-func newStartSpanConfig(opts ...StartSpanOption) *startSpanConfig {
-	c := &startSpanConfig{}
+func newStartSpanConfig(opts ...StartSpanOption) startSpanConfig {
+	var c startSpanConfig
 	var defaultOpts []StartSpanOption
 
 	for _, opt := range append(defaultOpts, opts...) {
-		opt(c)
+		opt(&c)
 	}
 
 	return c

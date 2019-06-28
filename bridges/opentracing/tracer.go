@@ -18,12 +18,12 @@ type Tracer struct {
 func NewTracer(opts ...TracerOption) opentracing.Tracer {
 	c := newTracerConfig(opts...)
 
-	return &Tracer{
+	return Tracer{
 		exporter: c.exporter,
 	}
 }
 
-func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOption) opentracing.Span {
+func (t Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOption) opentracing.Span {
 	var config opentracing.StartSpanOptions
 
 	for _, opt := range opts {
@@ -51,13 +51,13 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 
 	ctx = trace.StartSpan(ctx, operationName, sso...)
 
-	return &Span{
+	return Span{
 		tracer: t,
 		ctx:    ctx,
 	}
 }
 
-func (t *Tracer) Inject(spanContext opentracing.SpanContext, format interface{}, carrier interface{}) error {
+func (t Tracer) Inject(spanContext opentracing.SpanContext, format interface{}, carrier interface{}) error {
 	switch sc := spanContext.(type) {
 	case *SpanContext:
 		switch format {
@@ -73,7 +73,7 @@ func (t *Tracer) Inject(spanContext opentracing.SpanContext, format interface{},
 	}
 }
 
-func (t *Tracer) Extract(format interface{}, carrier interface{}) (opentracing.SpanContext, error) {
+func (t Tracer) Extract(format interface{}, carrier interface{}) (opentracing.SpanContext, error) {
 	switch format {
 	case opentracing.Binary:
 		return extractBinary(carrier)

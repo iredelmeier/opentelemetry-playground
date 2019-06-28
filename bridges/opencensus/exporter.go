@@ -11,15 +11,15 @@ type Exporter struct {
 	spanExporter trace.SpanExporter
 }
 
-func NewExporter(opts ...Option) *Exporter {
+func NewExporter(opts ...Option) Exporter {
 	c := newConfig(opts...)
 
-	return &Exporter{
+	return Exporter{
 		spanExporter: c.spanExporter,
 	}
 }
 
-func (e *Exporter) ExportSpan(span *octrace.SpanData) {
+func (e Exporter) ExportSpan(span *octrace.SpanData) {
 	startOpts := []trace.StartSpanOption{
 		trace.WithID(trace.SpanID(span.SpanContext.SpanID)),
 		trace.WithTraceID(trace.TraceID(span.SpanContext.TraceID)),

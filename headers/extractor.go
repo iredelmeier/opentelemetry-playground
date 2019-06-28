@@ -12,13 +12,13 @@ type Extractor struct {
 	headers http.Header
 }
 
-func NewExtractor(headers http.Header) *Extractor {
-	return &Extractor{
+func NewExtractor(headers http.Header) Extractor {
+	return Extractor{
 		headers: headers,
 	}
 }
 
-func (e *Extractor) Extract(ctx context.Context) trace.TraceContext {
+func (e Extractor) Extract(ctx context.Context) trace.TraceContext {
 	traceContext, err := tracecontext.FromHeaders(e.headers)
 	if err != nil {
 		return trace.TraceContext{}

@@ -14,14 +14,14 @@ type tracerConfig struct {
 	exporter trace.SpanExporter
 }
 
-func newTracerConfig(opts ...TracerOption) *tracerConfig {
-	c := &tracerConfig{}
+func newTracerConfig(opts ...TracerOption) tracerConfig {
+	var c tracerConfig
 	defaultOpts := []TracerOption{
 		WithExporter(trace.NoopSpanExporter{}),
 	}
 
 	for _, opt := range append(defaultOpts, opts...) {
-		opt(c)
+		opt(&c)
 	}
 
 	return c
