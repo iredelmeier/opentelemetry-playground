@@ -39,7 +39,7 @@ func traceHandler(exporter opentelemetry.SpanExporter, handler http.HandlerFunc)
 		parentSpan := extractor.Extract(r.Context())
 		opts := []opentelemetry.StartSpanOption{
 			opentelemetry.WithTraceID(parentSpan.TraceID),
-			opentelemetry.WithParentID(parentSpan.ID),
+			opentelemetry.WithParentID(parentSpan.SpanID),
 		}
 
 		ctx := opentelemetry.ContextWithSpanExporter(r.Context(), exporter)

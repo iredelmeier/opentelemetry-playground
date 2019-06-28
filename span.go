@@ -8,8 +8,7 @@ import (
 )
 
 type Span struct {
-	ID            SpanID
-	TraceID       TraceID
+	TraceContext  TraceContext
 	ParentID      SpanID
 	OperationName string
 	StartTime     time.Time
@@ -57,8 +56,10 @@ func finishSpan(ctx context.Context, span *internal.Span) {
 		}
 
 		exporter.ExportSpan(Span{
-			ID:            span.ID(),
-			TraceID:       span.TraceID(),
+			TraceContext: TraceContext{
+				TraceID: span.TraceID(),
+				SpanID:  span.ID(),
+			},
 			ParentID:      span.ParentID(),
 			OperationName: span.OperationName(),
 			StartTime:     span.StartTime(),
