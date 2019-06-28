@@ -39,7 +39,9 @@ func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOptio
 
 func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 	if span, ok := internal.SpanFromContext(ctx); ok {
-		span.Finish(ctx)
+		c := newFinishSpanConfig(opts...)
+
+		span.Finish(ctx, c.opts...)
 	}
 }
 
