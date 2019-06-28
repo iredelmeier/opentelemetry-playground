@@ -20,21 +20,19 @@ func NewInjector(headers http.Header) *Injector {
 }
 
 func (i *Injector) Inject(ctx context.Context) {
-	if traceID, ok := trace.TraceIDFromContext(ctx); ok {
-		if spanID, ok := trace.SpanIDFromContext(ctx); ok {
-			traceParent := traceparent.TraceParent{
-				Version: traceparent.Version,
-				TraceID: traceID,
-				SpanID:  spanID,
-				Flags: traceparent.Flags{
-					Recorded: true,
-				},
-			}
-			traceContext := tracecontext.TraceContext{
-				TraceParent: traceParent,
-			}
-
-			traceContext.SetHeaders(i.headers)
+	if traceContext, ok := trace.TraceContextFromContext(ctx); ok {
+		traceParent := traceparent.TraceParent{
+			Version: traceparent.Version,
+			TraceID: traceContext.TraceID,
+			SpanID:  traceContext.SpanID,
+			Flags: traceparent.Flags{
+				Recorded: true,
+			},
 		}
+		traceContext := tracecontext.TraceContext{
+			TraceParent: traceParent,
+		}
+
+		traceContext.SetHeaders(i.headers)
 	}
 }

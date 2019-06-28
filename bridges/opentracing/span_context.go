@@ -12,8 +12,7 @@ import (
 )
 
 type SpanContext struct {
-	id      trace.SpanID
-	traceID trace.TraceID
+	traceContext trace.TraceContext
 }
 
 func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {}
@@ -21,8 +20,8 @@ func (sc *SpanContext) ForeachBaggageItem(handler func(k, v string) bool) {}
 func (sc *SpanContext) traceParent() traceparent.TraceParent {
 	return traceparent.TraceParent{
 		Version: traceparent.Version,
-		SpanID:  sc.id,
-		TraceID: sc.traceID,
+		SpanID:  sc.traceContext.SpanID,
+		TraceID: sc.traceContext.TraceID,
 		Flags: traceparent.Flags{
 			Recorded: true,
 		},
@@ -79,8 +78,10 @@ func extractBinary(carrier interface{}) (*SpanContext, error) {
 		}
 
 		return &SpanContext{
-			id:      traceParent.SpanID,
-			traceID: traceParent.TraceID,
+			traceContext: trace.TraceContext{
+				TraceID: traceParent.TraceID,
+				SpanID:  traceParent.SpanID,
+			},
 		}, nil
 	default:
 		return nil, opentracing.ErrInvalidCarrier
@@ -95,9 +96,13 @@ func extractTextMap(carrier interface{}) (*SpanContext, error) {
 			return nil, err
 		}
 
+		traceParent := traceContext.TraceParent
+
 		return &SpanContext{
-			id:      traceContext.TraceParent.SpanID,
-			traceID: traceContext.TraceParent.TraceID,
+			traceContext: trace.TraceContext{
+				TraceID: traceParent.TraceID,
+				SpanID:  traceParent.SpanID,
+			},
 		}, nil
 	case opentracing.HTTPHeadersCarrier:
 		return extractTextMap(http.Header(c))
@@ -119,8 +124,10 @@ func extractTextMap(carrier interface{}) (*SpanContext, error) {
 		}
 
 		return &SpanContext{
-			id:      traceParent.SpanID,
-			traceID: traceParent.TraceID,
+			traceContext: trace.TraceContext{
+				TraceID: traceParent.TraceID,
+				SpanID:  traceParent.SpanID,
+			},
 		}, nil
 	default:
 		return nil, opentracing.ErrInvalidCarrier

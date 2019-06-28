@@ -37,8 +37,8 @@ func (t *Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOp
 	for _, ref := range config.References {
 		if sc, ok := ref.ReferencedContext.(*SpanContext); ok {
 			parentOpts := []trace.StartSpanOption{
-				trace.WithTraceID(sc.traceID),
-				trace.WithParentID(sc.id),
+				trace.WithTraceID(sc.traceContext.TraceID),
+				trace.WithParentID(sc.traceContext.SpanID),
 			}
 
 			sso = append(sso, parentOpts...)

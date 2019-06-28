@@ -25,12 +25,9 @@ func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOptio
 		internal.WithFinishSpan(finishSpan),
 	}
 
-	if traceID, ok := TraceIDFromContext(ctx); ok {
-		spanOpts = append(spanOpts, internal.WithTraceID(traceID))
-	}
-
-	if parentID, ok := SpanIDFromContext(ctx); ok {
-		spanOpts = append(spanOpts, internal.WithParentID(parentID))
+	if traceContext, ok := TraceContextFromContext(ctx); ok {
+		spanOpts = append(spanOpts, internal.WithTraceID(traceContext.TraceID))
+		spanOpts = append(spanOpts, internal.WithParentID(traceContext.SpanID))
 	}
 
 	spanOpts = append(spanOpts, c.opts...)

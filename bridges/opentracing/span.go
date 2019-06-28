@@ -27,12 +27,8 @@ func (s *Span) FinishWithOptions(opts opentracing.FinishOptions) {
 func (s *Span) Context() opentracing.SpanContext {
 	spanContext := &SpanContext{}
 
-	if id, ok := trace.SpanIDFromContext(s.ctx); ok {
-		spanContext.id = id
-	}
-
-	if traceID, ok := trace.TraceIDFromContext(s.ctx); ok {
-		spanContext.traceID = traceID
+	if traceContext, ok := trace.TraceContextFromContext(s.ctx); ok {
+		spanContext.traceContext = traceContext
 	}
 
 	return spanContext
