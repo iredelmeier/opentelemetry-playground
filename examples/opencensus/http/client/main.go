@@ -10,13 +10,12 @@ import (
 	"github.com/iredelmeier/opentelemetry-playground/bridges/opencensus"
 	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/examples/opencensus/http/internal"
-	"github.com/iredelmeier/opentelemetry-playground/trace"
 	"go.opencensus.io/plugin/ochttp"
 	octrace "go.opencensus.io/trace"
 )
 
 func main() {
-	exporter := trace.NewNonBlockingSpanExporter(file.NewExporter())
+	exporter := file.NewExporter()
 	defer exporter.Close(context.Background())
 
 	ocExporter := opencensus.NewExporter(opencensus.WithSpanExporter(exporter))
