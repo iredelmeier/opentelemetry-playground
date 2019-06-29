@@ -2,6 +2,7 @@ package file
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"encoding/json"
 
@@ -9,20 +10,35 @@ import (
 )
 
 type Exporter struct {
-	encoder      *json.Encoder
-	errorHandler ErrorHandler
+	exporter trace.NonBlockingSpanExporter
 }
 
 func NewExporter(opts ...Option) Exporter {
 	c := newConfig(opts...)
-
-	return Exporter{
+	e := exporter{
 		encoder:      json.NewEncoder(c.file),
 		errorHandler: c.errorHandler,
+	}
+
+	return Exporter{
+		exporter: trace.NewNonBlockingSpanExporter(e),
 	}
 }
 
 func (e Exporter) ExportSpan(span trace.Span) {
+	e.exporter.ExportSpan(span)
+}
+
+func (e Exporter) Close(ctx context.Context) error {
+	return e.exporter.Close(ctx)
+}
+
+type exporter struct {
+	encoder      *json.Encoder
+	errorHandler ErrorHandler
+}
+
+func (e exporter) ExportSpan(span trace.Span) {
 	var parentID string
 	if id := span.ParentID; !isEmptySpanID(id) {
 		parentID = hex.EncodeToString(id[:])

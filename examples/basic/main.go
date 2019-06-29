@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	exporter := trace.NewNonBlockingSpanExporter(file.NewExporter())
+	exporter := file.NewExporter()
 	defer exporter.Close(context.Background())
 
 	ctx := trace.ContextWithSpanExporter(context.Background(), exporter)
