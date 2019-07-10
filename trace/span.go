@@ -64,37 +64,37 @@ func FinishSpan(ctx context.Context, opts ...FinishSpanOption) {
 }
 
 func finishSpan(ctx context.Context, span internal.Span) {
-	if exporter, ok := SpanExporterFromContext(ctx); ok {
-		s := Span{
-			TraceContext: TraceContext{
-				TraceID: span.TraceID(),
-				SpanID:  span.ID(),
-			},
-			ParentID:      span.ParentID(),
-			OperationName: span.OperationName(),
-			StartTime:     span.StartTime(),
-			FinishTime:    span.FinishTime(),
-			Attributes:    make(map[string]string),
-		}
+	s := Span{
+		TraceContext: TraceContext{
+			TraceID: span.TraceID(),
+			SpanID:  span.ID(),
+		},
+		ParentID:      span.ParentID(),
+		OperationName: span.OperationName(),
+		StartTime:     span.StartTime(),
+		FinishTime:    span.FinishTime(),
+		Attributes:    make(map[string]string),
+	}
 
-		if attributes, ok := rootinternal.AttributesFromContext(ctx); ok {
-			for _, attribute := range attributes.Entries() {
-				s.Attributes[attribute.Key] = attribute.Value
-			}
-		}
-
-		for _, attribute := range span.Attributes() {
+	if attributes, ok := rootinternal.AttributesFromContext(ctx); ok {
+		for _, attribute := range attributes.Entries() {
 			s.Attributes[attribute.Key] = attribute.Value
 		}
+	}
 
-		if spanEventExporter, ok := SpanEventExporterFromContext(ctx); ok {
-			spanEventExporter.ExportFinishSpanEvent(FinishSpanEvent{
-				TraceContext: s.TraceContext,
-				FinishTime:   s.FinishTime,
-				Attributes:   s.Attributes,
-			})
-		}
+	for _, attribute := range span.Attributes() {
+		s.Attributes[attribute.Key] = attribute.Value
+	}
 
+	if spanEventExporter, ok := SpanEventExporterFromContext(ctx); ok {
+		spanEventExporter.ExportFinishSpanEvent(FinishSpanEvent{
+			TraceContext: s.TraceContext,
+			FinishTime:   s.FinishTime,
+			Attributes:   s.Attributes,
+		})
+	}
+
+	if exporter, ok := SpanExporterFromContext(ctx); ok {
 		exporter.ExportSpan(s)
 	}
 }
