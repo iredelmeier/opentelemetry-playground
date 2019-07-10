@@ -2,8 +2,6 @@ module github.com/iredelmeier/opentelemetry-playground/examples/http
 
 go 1.12
 
-replace github.com/iredelmeier/opentelemetry-experimental-spike => ../..
-
 replace github.com/iredelmeier/opentelemetry-playground => ../..
 
 require (
