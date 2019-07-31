@@ -34,7 +34,13 @@ func StartSpan(ctx context.Context, operationName string, opts ...StartSpanOptio
 
 	span := internal.NewSpan(spanOpts...)
 
-	if spanEventExporter, ok := SpanEventExporterFromContext(ctx); ok {
+	var spanEventExporter SpanEventExporter
+
+	if exporter, ok := SpanEventExporterFromContext(ctx); ok {
+		spanEventExporter = exporter
+	}
+
+	if spanEventExporter != nil {
 		spanEventExporter.ExportStartSpanEvent(StartSpanEvent{
 			TraceContext: TraceContext{
 				TraceID: span.TraceID(),
@@ -86,7 +92,13 @@ func finishSpan(ctx context.Context, span internal.Span) {
 		s.Attributes[attribute.Key] = attribute.Value
 	}
 
-	if spanEventExporter, ok := SpanEventExporterFromContext(ctx); ok {
+	spanEventExporter := GlobalSpanEventExporter()
+
+	if exporter, ok := SpanEventExporterFromContext(ctx); ok {
+		spanEventExporter = exporter
+	}
+
+	if spanEventExporter != nil {
 		spanEventExporter.ExportFinishSpanEvent(FinishSpanEvent{
 			TraceContext: s.TraceContext,
 			FinishTime:   s.FinishTime,
@@ -94,7 +106,13 @@ func finishSpan(ctx context.Context, span internal.Span) {
 		})
 	}
 
+	spanExporter := GlobalSpanExporter()
+
 	if exporter, ok := SpanExporterFromContext(ctx); ok {
-		exporter.ExportSpan(s)
+		spanExporter = exporter
+	}
+
+	if spanExporter != nil {
+		spanExporter.ExportSpan(s)
 	}
 }

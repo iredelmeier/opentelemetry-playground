@@ -5,6 +5,8 @@ import (
 	"sync"
 )
 
+var globalSpanEventExporter SpanEventExporter
+
 type spanEventExporterCtxKey struct{}
 
 type SpanEventExporter interface {
@@ -20,6 +22,18 @@ func SpanEventExporterFromContext(ctx context.Context) (SpanEventExporter, bool)
 	spanEventExporter, ok := ctx.Value(spanEventExporterCtxKey{}).(SpanEventExporter)
 
 	return spanEventExporter, ok
+}
+
+func GlobalSpanEventExporter() SpanEventExporter {
+	if globalSpanEventExporter == nil {
+		return NoopSpanEventExporter{}
+	}
+
+	return globalSpanEventExporter
+}
+
+func SetGlobalSpanEventExporter(spanEventExporter SpanEventExporter) {
+	globalSpanEventExporter = spanEventExporter
 }
 
 type NoopSpanEventExporter struct{}

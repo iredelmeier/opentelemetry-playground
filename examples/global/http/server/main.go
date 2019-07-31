@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/iredelmeier/opentelemetry-playground/examples/http/internal"
+	"github.com/iredelmeier/opentelemetry-playground/examples/global/http/internal"
 	"github.com/iredelmeier/opentelemetry-playground/examples/internal/exporters/file"
 	"github.com/iredelmeier/opentelemetry-playground/headers"
 	"github.com/iredelmeier/opentelemetry-playground/trace"
@@ -16,6 +16,8 @@ func main() {
 	exporter := file.NewExporter()
 	defer exporter.Close(context.Background())
 
+	trace.SetGlobalSpanExporter(exporter)
+
 	serveMux := http.NewServeMux()
 
 	serveMux.HandleFunc(internal.Path, func(w http.ResponseWriter, r *http.Request) {
@@ -24,7 +26,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    internal.Host,
-		Handler: traceHandler(exporter, serveMux.ServeHTTP),
+		Handler: traceHandler(serveMux.ServeHTTP),
 	}
 	defer server.Close()
 
@@ -33,7 +35,7 @@ func main() {
 	}
 }
 
-func traceHandler(exporter trace.SpanExporter, handler http.HandlerFunc, opts ...Option) http.HandlerFunc {
+func traceHandler(handler http.HandlerFunc, opts ...Option) http.HandlerFunc {
 	c := newConfig(opts...)
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -43,9 +45,7 @@ func traceHandler(exporter trace.SpanExporter, handler http.HandlerFunc, opts ..
 			trace.WithParentID(parentSpan.SpanID),
 		}
 
-		ctx := trace.ContextWithSpanExporter(r.Context(), exporter)
-
-		ctx = trace.StartSpan(ctx, fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
+		ctx := trace.StartSpan(r.Context(), fmt.Sprintf("HTTP GET: %s", r.URL.Path), opts...)
 		defer trace.FinishSpan(ctx)
 
 		r = r.WithContext(ctx)
