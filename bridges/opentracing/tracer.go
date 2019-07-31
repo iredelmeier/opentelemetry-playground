@@ -59,7 +59,7 @@ func (t Tracer) StartSpan(operationName string, opts ...opentracing.StartSpanOpt
 
 func (t Tracer) Inject(spanContext opentracing.SpanContext, format interface{}, carrier interface{}) error {
 	switch sc := spanContext.(type) {
-	case *SpanContext:
+	case SpanContext:
 		switch format {
 		case opentracing.Binary:
 			return sc.injectBinary(carrier)
